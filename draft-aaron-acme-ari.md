@@ -22,14 +22,14 @@
 #
 # Delete this comment when you are done.
 #
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
-docname: draft-todo-yourname-protocol-latest
+title: "Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension"
+abbrev: "ACME ARI"
+docname: draft-aaron-acme-ari-latest
 category: info
 
 ipr: trust200902
-area: TODO
-workgroup: TODO Working Group
+area: Security Area (sec)
+workgroup: ACME Working Group
 keyword: Internet-Draft
 
 stand_alone: yes
@@ -38,9 +38,9 @@ pi: [toc, sortrefs, symrefs]
 
 author:
  -
-    name: Your Name Here
-    organization: Your Organization Here
-    email: your.email@example.com
+    name: Aaron Gable
+    organization: Internet Security Research Group
+    email: aaron@letsencrypt.org
 
 normative:
 
