@@ -12,11 +12,6 @@ value = "draft-aaron-acme-ari-latest"
 stream = "IETF"
 status = "standard"
 
-docname = "draft-aaron-acme-ari-latest"
-stand_alone = "yes"
-smart_quotes = "no"
-pi = ["toc", "sortrefs", "symrefs"]
-
 [[author]]
   name = "Aaron Gable"
   initials = "A."
