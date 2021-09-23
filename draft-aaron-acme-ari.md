@@ -23,7 +23,7 @@ status = "standard"
 
 .# Abstract
 
-TODO Abstract
+This document specifies how an ACME server may provide hints to ACME clients as to when they should attempt to renew their certificates. This allows servers to mitigate load spikes, and ensures clients do not make false assumptions about appropriate certificate renewal periods.
 
 {mainmatter}
 
