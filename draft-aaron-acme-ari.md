@@ -29,7 +29,7 @@ This document specifies how an ACME server may provide hints to ACME clients as 
 
 # Introduction
 
-Most ACME clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g. via `cron`); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing CA changing certificate lifetimes. All three techniques lead to load clustering for the issuing CA.
+Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g. via `cron`); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing CA changing certificate lifetimes. All three techniques lead to load clustering for the issuing CA.
 
 Being able to indicate to the client a period in which the issuing CA suggests renewal would allow both dynamic changes to the certificate validity period and proactive smearing of load. This document specifies a mechanism by which ACME servers may provide suggested renewal windows to ACME clients.
 
@@ -37,7 +37,13 @@ Being able to indicate to the client a period in which the issuing CA suggests r
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@!RFC2119] [@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-# Extensions to the ACME Protocol: The "order" Resource
+# Extensions to the ACME Protocol: The "directory" Resource
+
+An ACME server which wishes to provide renewal information **MUST** include a new field, "renewalInfo", in its directory object.
+
+Field      | URL in Value
+-----------|-------------
+newNonce   | Renewal info
 
 An ACME server which wishes to provide renewal information **MUST** include a new field, "renewalInfo", in finalized Order objects.
 
@@ -48,33 +54,33 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "status": "valid",
-  "expires": "2021-01-20T14:09:07.99Z",
-
-  "identifiers": [
-    { "type": "dns", "value": "www.example.org" },
-    { "type": "dns", "value": "example.org" }
-  ],
-
-  "notBefore": "2021-01-01T00:00:00Z",
-  "notAfter": "2021-01-08T00:00:00Z",
-
-  "authorizations": [
-    "https://example.com/acme/authz/PAniVnsZcis",
-    "https://example.com/acme/authz/r4HqLzrSrpI"
-  ],
-
-  "finalize": "https://example.com/acme/order/TOlocE8rfgo/finalize",
-  "certificate": "https://example.com/acme/cert/mAt3xBGaobw",
-  "renewalInfo": "https://example.com/acme/renewal/eXoM9UwLgbL"
+  "newNonce": "https://example.com/acme/new-nonce",
+  "newAccount": "https://example.com/acme/new-account",
+  "newOrder": "https://example.com/acme/new-order",
+  "newAuthz": "https://example.com/acme/new-authz",
+  "revokeCert": "https://example.com/acme/revoke-cert",
+  "keyChange": "https://example.com/acme/key-change",
+  "renewalInfo": "https://example.com/acme/renewal-info",
+  "meta": {
+    "termsOfService": "https://example.com/acme/terms/2021-10-05",
+    "website": "https://www.example.com/",
+    "caaIdentities": ["example.com"],
+    "externalAccountRequired": false
+  }
 }
 ~~~
 
-Conforming clients **SHOULD** store the "renewalInfo" URL locally so that they can poll it at any time during the lifetime of the certificate.
-
 # Extensions to the ACME Protocol: The "renewalInfo" Resource
 
-We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol.
+We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET or POST-as-GET request to a path under the server's renewalInfo URL.
+
+The full request URL is computed by concatenating the renewalInfo URL from the server's directory, a forward slash, and the hex-encoded SHA-1 hash of the certificate (sometimes called the certificate fingerprint or thumbprint).
+
+Conforming servers **MUST** provide the renewalInfo resource via POST-as-GET; they **SHOULD** provide it via unauthenticated GET as well. Conforming clients **SHOULD** use unauthenticated GET to request renewalInfo resources.
+
+~~~ text
+GET https://example.com/acme/renewal-info/E9F370EA42AC6CB9D6FB51FE9D0CAA4CC9EBFC412BBA33D14BA8467ACF59CF19
+~~~
 
 The structure of an ACME renewalInfo resource is as follows:
 
@@ -91,8 +97,6 @@ Content-Type: application/json
   }
 }
 ~~~
-
-Conforming servers **MUST** provide the renewalInfo resource via POST-as-GET; they **SHOULD** provide it via unauthenticated GET as well. Conforming clients **SHOULD** use unauthenticated GET to request renewalInfo resources.
 
 The server **SHOULD** include a Retry-After header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the "renewalInfo" URL again after the Retry-After period has passed, as the server may provide a different suggestedWindow.
 
@@ -119,14 +123,6 @@ Within the "Automated Certificate Management Environment (ACME) Protocol" regist
 Field Name  | Resource Type       | Reference
 ------------|---------------------|-----------
 renewalInfo | Renewal Info object | This draft
-
-## ACME Order Object Fields
-
-Within the "Automated Certificate Management Environment (ACME) Protocol" registry, the following entry has been added to the "ACME Order Object Fields" registry.
-
-Field Name  | Field Type | Configurable | Reference
-------------|------------|--------------|-----------
-renewalInfo | string     | false        | This draft
 
 ## ACME Renewal Info Object Fields
 
