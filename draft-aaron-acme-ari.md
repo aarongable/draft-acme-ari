@@ -72,11 +72,9 @@ Content-Type: application/json
 
 # Extensions to the ACME Protocol: The "renewalInfo" Resource
 
-We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET or POST-as-GET request to a path under the server's renewalInfo URL.
+We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's renewalInfo URL.
 
 The full request URL is computed by concatenating the renewalInfo URL from the server's directory, a forward slash, and the hex-encoded SHA-1 hash of the certificate (sometimes called the certificate fingerprint or thumbprint).
-
-Conforming servers **MUST** provide the renewalInfo resource via POST-as-GET; they **SHOULD** provide it via unauthenticated GET as well. Conforming clients **SHOULD** use unauthenticated GET to request renewalInfo resources.
 
 ~~~ text
 GET https://example.com/acme/renewal-info/E9F370EA42AC6CB9D6FB51FE9D0CAA4CC9EBFC412BBA33D14BA8467ACF59CF19
@@ -106,7 +104,7 @@ Conforming clients **SHOULD** select a random time within the suggested window t
 
 The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in Section 10.1 of [@!RFC8555].
 
-This document specifies that renewalInfo resources should be exposed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in renewalInfo resources is not considered confidential, and because allowing renewalInfo to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
+This document specifies that renewalInfo resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in renewalInfo resources is not considered confidential, and because allowing renewalInfo to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
 
 # IANA Considerations
 
