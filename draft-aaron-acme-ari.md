@@ -41,9 +41,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 An ACME server which wishes to provide renewal information **MUST** include a new field, "renewalInfo", in its directory object.
 
-Field      | URL in Value
------------|-------------
-newNonce   | Renewal info
+Field         | URL in Value
+--------------|-------------
+renewalInfo   | Renewal info
 
 An ACME server which wishes to provide renewal information **MUST** include a new field, "renewalInfo", in finalized Order objects.
 
@@ -74,10 +74,19 @@ Content-Type: application/json
 
 We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's renewalInfo URL.
 
-The full request URL is computed by concatenating the renewalInfo URL from the server's directory, a forward slash, and the hex-encoded SHA-1 hash of the certificate (sometimes called the certificate fingerprint or thumbprint).
+The full request URL is computed by concatenating the renewalInfo URL from the server's directory with the following case-insensitive hex-encoded ([@!RFC4648], Section 8) elements, separated by forward slashes:
+
+* the SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier ([@!RFC5280], Section 4.2.1.1),
+* the SHA-1 hash of the issuer's Distinguished Name ([@!RFC5280], Section 4.1.2.4), and
+* the certificate serial number.
+
+These are the same components that make up the `CertID` section of an `OCSPRequest` ([@!RFC6960], Section 4.1.1), with the caveat that the hash algorithm is restricted to SHA-1, in line with [@!RFC5019].
 
 ~~~ text
-GET https://example.com/acme/renewal-info/E9F370EA42AC6CB9D6FB51FE9D0CAA4CC9EBFC412BBA33D14BA8467ACF59CF19
+GET https://example.com/acme/renewal-info
+        /254581685026383D3B2D2CBECD6AD9B63DB36663
+        /06FE0BABD8E6746EFCC4730285F7A9487ED1344F
+        /BCDF4596B6BDC523
 ~~~
 
 The structure of an ACME renewalInfo resource is as follows:
