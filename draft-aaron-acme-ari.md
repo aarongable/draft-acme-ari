@@ -74,13 +74,13 @@ Content-Type: application/json
 
 We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET or POST-as-GET request to a path under the server's renewalInfo URL.
 
-The full request URL is computed by concatenating the renewalInfo URL from the server's directory with the following elements, separated by forward slashes:
+The full request URL is computed by concatenating the renewalInfo URL from the server's directory with the following case-insensitive hex-encoded ([@!RFC4648], Section 8) elements, separated by forward slashes:
 
-* the hex-encoded SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier ([@!RFC5280], Section 4.2.1.1),
-* the hex-encoded SHA-1 hash of the issuer's Distinguished Name ([@!RFC5280], Section 4.1.2.4), and
-* the hex-encoded certificate serial number.
+* the SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier ([@!RFC5280], Section 4.2.1.1),
+* the SHA-1 hash of the issuer's Distinguished Name ([@!RFC5280], Section 4.1.2.4), and
+* the certificate serial number.
 
-These are the same components that make up the `CertID` section of an `OCSPRequest` ([@!RFC6960], Section 4.1.1), with the exception that the hash algorithm is restricted to SHA-1.
+These are the same components that make up the `CertID` section of an `OCSPRequest` ([@!RFC6960], Section 4.1.1), with the caveat that the hash algorithm is restricted to SHA-1, in line with [@!RFC5019].
 
 Conforming servers **MUST** provide the renewalInfo resource via POST-as-GET; they **SHOULD** provide it via unauthenticated GET as well. Conforming clients **SHOULD** use unauthenticated GET to request renewalInfo resources.
 
