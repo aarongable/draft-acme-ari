@@ -39,15 +39,11 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 # Extensions to the ACME Protocol: The "directory" Resource
 
-An ACME server which wishes to provide renewal information **MUST** include a new field, "renewalInfo", in its directory object.
+An ACME server which wishes to provide renewal information **MUST** include a new field, `renewalInfo`, in its directory object.
 
 Field         | URL in Value
 --------------|-------------
 renewalInfo   | Renewal info
-
-An ACME server which wishes to provide renewal information **MUST** include a new field, "renewalInfo", in finalized Order objects.
-
-renewalInfo (optional, string): A URL for renewal information for the certificate that has been issued in response to this order.
 
 ~~~ json
 HTTP/1.1 200 OK
@@ -72,11 +68,11 @@ Content-Type: application/json
 
 # Extensions to the ACME Protocol: The "renewalInfo" Resource
 
-We define a new resource type, the "renewalInfo" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's renewalInfo URL.
+We define a new resource type, the "`renewalInfo`" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The full request URL is computed by concatenating the renewalInfo URL from the server's directory with the following case-insensitive hex-encoded ([@!RFC4648], Section 8) elements, separated by forward slashes:
+The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with the following case-insensitive hex-encoded ([@!RFC4648], Section 8) elements, separated by forward slashes:
 
-* the SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier ([@!RFC5280], Section 4.2.1.1),
+* the SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier ([@!RFC5280], Section 4.2.1.1)),
 * the SHA-1 hash of the issuer's Distinguished Name ([@!RFC5280], Section 4.1.2.4), and
 * the certificate serial number.
 
@@ -89,13 +85,14 @@ GET https://example.com/acme/renewal-info
         /BCDF4596B6BDC523
 ~~~
 
-The structure of an ACME renewalInfo resource is as follows:
+The structure of an ACME `renewalInfo` resource is as follows:
 
-suggestedWindow (object, required): A JSON object with two keys, "start" and "end", whose values are timestamps, encoded in the format specified in [@!RFC3339], which bound the window of time in which the CA recommends renewing the certificate.
+`suggestedWindow` (object, required): A JSON object with two keys, "`start`" and "`end`", whose values are timestamps, encoded in the format specified in [@!RFC3339], which bound the window of time in which the CA recommends renewing the certificate.
 
 ~~~ json
 HTTP/1.1 200 OK
 Content-Type: application/json
+Retry-After: "21600"
 
 {
   "suggestedWindow": {
@@ -105,15 +102,15 @@ Content-Type: application/json
 }
 ~~~
 
-The server **SHOULD** include a Retry-After header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the "renewalInfo" URL again after the Retry-After period has passed, as the server may provide a different suggestedWindow.
+The server **SHOULD** include a Retry-After header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the `renewalInfo` URL again after the Retry-After period has passed, as the server may provide a different suggestedWindow.
 
-Conforming clients **SHOULD** select a random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately.
+Conforming clients **MUST** select a uniform random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately.
 
 # Security Considerations
 
 The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in Section 10.1 of [@!RFC8555].
 
-This document specifies that renewalInfo resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in renewalInfo resources is not considered confidential, and because allowing renewalInfo to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
+This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
 
 # IANA Considerations
 
