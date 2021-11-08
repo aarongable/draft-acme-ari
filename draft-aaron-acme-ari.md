@@ -25,6 +25,32 @@ status = "standard"
 
 This document specifies how an ACME server may provide hints to ACME clients as to when they should attempt to renew their certificates. This allows servers to mitigate load spikes, and ensures clients do not make false assumptions about appropriate certificate renewal periods.
 
+.# Current Implementations
+
+Draft note: this section will be removed by the editor before final publication.
+
+Let's Encrypt's Staging environment (available at [@lestaging], source at [@boulder]) implements this draft specification.
+
+<reference anchor='lestaging' target='https://acme-staging-v02.api.letsencrypt.org/directory'>
+    <front>
+        <title>Let's Encrypt Staging Environment</title>
+        <author>
+            <organization>Internet Security Research Group</organization>
+        </author>
+        <date year='2021'/>
+    </front>
+</reference>
+
+<reference anchor='boulder' target='https://github.com/letsencrypt/boulder'>
+    <front>
+        <title>Boulder</title>
+        <author>
+            <organization>Internet Security Research Group</organization>
+        </author>
+        <date year='2021'/>
+    </front>
+</reference>
+
 {mainmatter}
 
 # Introduction
@@ -104,7 +130,9 @@ Retry-After: "21600"
 
 The server **SHOULD** include a `Retry-After` header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the `renewalInfo` URL again after the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
 
-Conforming clients **MUST** select a uniform random time within the suggested window (inclusive of both endpoints) to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately. In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.
+Conforming clients **MUST** select a uniform random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately. In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.
+
+In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
 If the client receives no response or a malformed response (e.g. an `end` timestamp which precedes the `start` timestamp), it **SHOULD** make its own determination of when to renew the certificate, and **MAY** retry the `renewalInfo` request with appropriate exponential backoff behavior.
 
