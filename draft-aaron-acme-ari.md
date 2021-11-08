@@ -35,7 +35,7 @@ Being able to indicate to the client a period in which the issuing CA suggests r
 
 # Conventions and Definitions
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@!RFC2119] [@!RFC8174] when, and only when, they appear in all capitals, as shown here.
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@!RFC2119;@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
 # Extensions to the ACME Protocol: The "directory" Resource
 
@@ -70,13 +70,13 @@ Content-Type: application/json
 
 We define a new resource type, the "`renewalInfo`" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with the following case-insensitive hex-encoded ([@!RFC4648], Section 8) elements, separated by forward slashes:
+The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with the following case-insensitive hex-encoded (see [@!RFC4648], Section [@!RFC4648, section 8]) elements, separated by forward slashes:
 
-* the SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier ([@!RFC5280], Section 4.2.1.1)),
-* the SHA-1 hash of the issuer's Distinguished Name ([@!RFC5280], Section 4.1.2.4), and
+* the SHA-1 hash of the issuer's public key (often included in the certificate as the Authority Key Identifier, see [@!RFC5280], Section [@!RFC5280, section 4.2.1.1]),
+* the SHA-1 hash of the issuer's Distinguished Name, see [@!RFC5280], Section [@!RFC5280, section 4.1.2.4], and
 * the certificate serial number.
 
-These are the same components that make up the `CertID` section of an `OCSPRequest` ([@!RFC6960], Section 4.1.1), with the caveat that the hash algorithm is restricted to SHA-1, in line with [@!RFC5019].
+These are the same components that make up the `CertID` sequence of an `OCSPRequest` [@!RFC6960], Section [@RFC6960, section 4.1.1], with the caveat that the hash algorithm is restricted to SHA-1, in line with [@!RFC5019].
 
 ~~~ text
 GET https://example.com/acme/renewal-info
@@ -108,7 +108,7 @@ Conforming clients **MUST** select a uniform random time within the suggested wi
 
 # Security Considerations
 
-The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in Section 10.1 of [@!RFC8555].
+The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section [@!RFC8555, section 10.1].
 
 This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
 
