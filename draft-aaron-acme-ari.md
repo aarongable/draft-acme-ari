@@ -106,6 +106,8 @@ The server **SHOULD** include a `Retry-After` header indicating the polling inte
 
 Conforming clients **MUST** select a uniform random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately. In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.
 
+In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
+
 # Security Considerations
 
 The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section [@!RFC8555, section 10.1].
