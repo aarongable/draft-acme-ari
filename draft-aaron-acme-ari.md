@@ -25,6 +25,32 @@ status = "standard"
 
 This document specifies how an ACME server may provide hints to ACME clients as to when they should attempt to renew their certificates. This allows servers to mitigate load spikes, and ensures clients do not make false assumptions about appropriate certificate renewal periods.
 
+.# Current Implementations
+
+Draft note: this section will be removed by the editor before final publication.
+
+Let's Encrypt's Staging environment (available at [@lestaging], source at [@boulder]) implements this draft specification.
+
+<reference anchor='lestaging' target='https://acme-staging-v02.api.letsencrypt.org/directory'>
+    <front>
+        <title>Let's Encrypt Staging Environment</title>
+        <author>
+            <organization>Internet Security Research Group</organization>
+        </author>
+        <date year='2021'/>
+    </front>
+</reference>
+
+<reference anchor='boulder' target='https://github.com/letsencrypt/boulder'>
+    <front>
+        <title>Boulder</title>
+        <author>
+            <organization>Internet Security Research Group</organization>
+        </author>
+        <date year='2021'/>
+    </front>
+</reference>
+
 {mainmatter}
 
 # Introduction
