@@ -128,9 +128,11 @@ Retry-After: "21600"
 }
 ~~~
 
-The server **SHOULD** include a Retry-After header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the `renewalInfo` URL again after the Retry-After period has passed, as the server may provide a different suggestedWindow.
+The server **SHOULD** include a `Retry-After` header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the `renewalInfo` URL again after the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
 
-Conforming clients **MUST** select a uniform random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately.
+Conforming clients **MUST** select a uniform random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately. In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.
+
+In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
 # Security Considerations
 
