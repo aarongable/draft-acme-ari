@@ -134,6 +134,8 @@ Conforming clients **MUST** select a uniform random time within the suggested wi
 
 In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
+If the client receives no response or a malformed response (e.g. an `end` timestamp which precedes the `start` timestamp), it **SHOULD** make its own determination of when to renew the certificate, and **MAY** retry the `renewalInfo` request with appropriate exponential backoff behavior.
+
 # Security Considerations
 
 The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section [@!RFC8555, section 10.1].
