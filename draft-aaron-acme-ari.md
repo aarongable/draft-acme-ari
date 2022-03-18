@@ -94,7 +94,11 @@ Content-Type: application/json
 
 # Extensions to the ACME Protocol: The "renewalInfo" Resource
 
-We define a new resource type, the "`renewalInfo`" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
+We define a new resource type, the "`renewalInfo`" resource, as part of the ACME protocol. This new resource both allows clients to query the server for suggestions on when they should renew certificates, and allows clients to inform the server when they have completed renewal (or otherwise replaced the certificate to their satisfaction).
+
+## Getting Renewal Information
+
+To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
 The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with a forward slash and the base64url-encoded [@!RFC4648, section 5] bytes of a DER-encoded `CertID` ASN.1 sequence [@!RFC6960, section 4.1.1]. Trailing '=' characters MUST be stripped.
 
@@ -133,6 +137,40 @@ Conforming clients **MUST** select a uniform random time within the suggested wi
 In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
 If the client receives no response or a malformed response (e.g. an `end` timestamp which precedes the `start` timestamp), it **SHOULD** make its own determination of when to renew the certificate, and **MAY** retry the `renewalInfo` request with appropriate exponential backoff behavior.
+
+## Updating Renewal Information
+
+To update the renewal status of a certificate, the client sends a POST-as-GET request to the server's `renewalInfo` URL.
+
+The body of the POST is a JWS object whose JSON payload contains the `CertID` of the certificate in question:
+
+certID (required, string): The `CertID` of the certificate whose renewal information should be updated, in the base64url-encoded version of the DER format with trailing "=" stripped. Note: this is identical to the final path component constructed for GET requests above.
+
+replaced (required, boolean): Whether or not the certificate has been replaced. Clients SHOULD NOT send a request where this value is false.
+
+~~~ text
+POST /acme/renewal-info HTTP/1.1
+Host: example.com
+Content-Type: application/jose+json
+
+{
+  "protected": base64url({
+    "alg": "ES256",
+    "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+    "nonce": "JHb54aT_KTXBWQOzGYkt9A",
+    "url": "https://example.com/acme/renewal-info"
+  }),
+  "payload": base64url({
+    "certID": "MFswCwYJ...RWhlRB8c",
+    "replaced": true
+  }),
+  "signature": "Q1bURgJoEslbD1c5...3pYdSMLio57mQNN4"
+}
+~~~
+
+The server MUST verify that the request is signed by the account key of the Subscriber to which the certificate was originally issued. If the server accepts the request and the update succeeds, it responds with status code 200 (OK). If the update is rejected or fails, for example because the certificate has already been marked as renewed, the server returns an error.
+
+The server might use this renewal update to inform a number of processes, such as: not sending renewal reminder notifications for certificates that have been marked as replaced; sending empty or error responses to subsequent requests for the certificate's renewal information; or confidently revoking certificates subject to a mass revocation without fear of disrupting the Subscriber's operations.
 
 # Security Considerations
 
