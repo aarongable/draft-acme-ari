@@ -37,7 +37,7 @@ Let's Encrypt's Staging environment (available at [@lestaging], source at [@boul
         <author>
             <organization>Internet Security Research Group</organization>
         </author>
-        <date year='2021'/>
+        <date year='2022'/>
     </front>
 </reference>
 
@@ -47,7 +47,7 @@ Let's Encrypt's Staging environment (available at [@lestaging], source at [@boul
         <author>
             <organization>Internet Security Research Group</organization>
         </author>
-        <date year='2021'/>
+        <date year='2022'/>
     </front>
 </reference>
 
@@ -118,7 +118,7 @@ The structure of an ACME `renewalInfo` resource is as follows:
 ~~~ json
 HTTP/1.1 200 OK
 Content-Type: application/json
-Retry-After: "21600"
+Retry-After: 21600
 
 {
   "suggestedWindow": {
@@ -138,7 +138,7 @@ If the client receives no response or a malformed response (e.g. an `end` timest
 
 # Security Considerations
 
-The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section [@!RFC8555, section 10.1].
+The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555, section 10.1], Section 10.1.
 
 This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
 
@@ -156,7 +156,7 @@ Within the "Automated Certificate Management Environment (ACME) Protocol" regist
 
 Field Name  | Resource Type       | Reference
 ------------|---------------------|-----------
-renewalInfo | Renewal Info object | This draft
+renewalInfo | Renewal Info object | This document
 
 ## ACME Renewal Info Object Fields
 
@@ -172,7 +172,7 @@ Initial contents:
 
 Field Name      | Field type | Reference
 ----------------|------------|-----------
-suggestedWindow | object     | This draft
+suggestedWindow | object     | This document
 
 {backmatter}
 
