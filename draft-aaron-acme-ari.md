@@ -96,7 +96,7 @@ Content-Type: application/json
 
 We define a new resource type, the "`renewalInfo`" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with a forward slash and the base64url-encoding [@!RFC4648, see, section 5] of the bytes of the DER encoding of a CertID ASN.1 sequence [@!RFC6960, see, section 4.1.1]. Trailing '=' characters MUST be stripped.
+The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with a forward slash and the base64url-encoded [@!RFC4648, section 5] bytes of a DER-encoded `CertID` ASN.1 sequence [@!RFC6960, section 4.1.1]. Trailing '=' characters MUST be stripped.
 
 For example, to request renewal information for the certificate given in Appendix A.1, issued by the CA given in Appendix A.2, using SHA256, the client would make the following request (the path has been split onto multiple lines for readability):
 
