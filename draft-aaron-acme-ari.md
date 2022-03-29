@@ -113,6 +113,8 @@ The structure of an ACME `renewalInfo` resource is as follows:
 
 `suggestedWindow` (object, required): A JSON object with two keys, "`start`" and "`end`", whose values are timestamps, encoded in the format specified in [@!RFC3339], which bound the window of time in which the CA recommends renewing the certificate.
 
+`explanationURL` (string, optional): A URL pointing to a page which may explain why the suggested renewal window is what it is. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Conforming clients **SHOULD** provide this URL to their operator, if present.
+
 ~~~ json
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -122,7 +124,8 @@ Retry-After: 21600
   "suggestedWindow": {
     "start": "2021-01-03T00:00:00Z",
     "end": "2021-01-07T00:00:00Z"
-  }
+  },
+  "explanationURL": "https://example.com/docs/example-mass-reissuance-event"
 }
 ~~~
 
