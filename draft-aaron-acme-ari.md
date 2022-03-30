@@ -94,11 +94,15 @@ Content-Type: application/json
 
 # Extensions to the ACME Protocol: The "renewalInfo" Resource
 
-We define a new resource type, the "`renewalInfo`" resource, as part of the ACME protocol. To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
+The "`renewalInfo`" resource is a new resource type introduced to ACME protocol. This new resource both allows clients to query the server for suggestions on when they should renew certificates, and allows clients to inform the server when they have completed renewal (or otherwise replaced the certificate to their satisfaction).
+
+## Getting Renewal Information
+
+To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
 The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with a forward slash and the base64url-encoded [@!RFC4648, section 5] bytes of a DER-encoded `CertID` ASN.1 sequence [@!RFC6960, section 4.1.1]. Trailing '=' characters MUST be stripped.
 
-For example, to request renewal information for the certificate given in Appendix A.1, issued by the CA given in Appendix A.2, using SHA256, the client would make the following request (the path has been split onto multiple lines for readability):
+For example, to request renewal information for the end-entity certificate given in Appendix A.1, issued by the CA certificate given in Appendix A.2, using SHA256, the client would make the following request (the path has been split onto multiple lines for readability):
 
 ~~~ text
 GET https://example.com/acme/renewal-info/
@@ -107,7 +111,7 @@ GET https://example.com/acme/renewal-info/
         eZ7pTS8jYCCD6jRWhlRB8c
 ~~~
 
-The ACME Server **MAY** restrict the hash algorithms which it accepts (for example, only allowing SHA256 to limit the number of potential cache keys); if it receives a request whose embedded `signatureAlgorithm` field contains an unacceptable OID, it **SHOULD** respond with an HTTP 400 status code.
+The ACME Server **MAY** restrict the hash algorithms which it accepts (for example, only allowing SHA256 to limit the number of potential cache keys); if it receives a request whose embedded `signatureAlgorithm` field contains an unacceptable OID, it **SHOULD** respond with HTTP status code 400 (Bad Request).
 
 The structure of an ACME `renewalInfo` resource is as follows:
 
@@ -137,9 +141,43 @@ In particular, cron-based clients may find they need to increase their run frequ
 
 If the client receives no response or a malformed response (e.g. an `end` timestamp which precedes the `start` timestamp), it **SHOULD** make its own determination of when to renew the certificate, and **MAY** retry the `renewalInfo` request with appropriate exponential backoff behavior.
 
+## Updating Renewal Information
+
+To update the renewal status of a certificate, the client sends a POST request to the server's `renewalInfo` URL.
+
+The body of the POST is a JWS object which is authenticated to an account as defined in [@!RFC8555], Section 6.2, and whose JSON payload has the following structure:
+
+certID (required, string): The `CertID` of the certificate whose renewal information should be updated, in the base64url-encoded version of the DER format with trailing "=" stripped. Note: this is identical to the final path component constructed for GET requests above.
+
+replaced (required, boolean): Whether or not the client considers the certificate to have been replaced. A certificate is considered replaced when its revocation would not disrupt any ongoing services, for instance because it has been renewed and the new certificate is in use, or because it is no longer in use. Clients SHOULD NOT send a request where this value is false.
+
+~~~ text
+POST /acme/renewal-info HTTP/1.1
+Host: example.com
+Content-Type: application/jose+json
+
+{
+  "protected": base64url({
+    "alg": "ES256",
+    "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+    "nonce": "JHb54aT_KTXBWQOzGYkt9A",
+    "url": "https://example.com/acme/renewal-info"
+  }),
+  "payload": base64url({
+    "certID": "MFswCwYJ...RWhlRB8c",
+    "replaced": true
+  }),
+  "signature": "Q1bURgJoEslbD1c5...3pYdSMLio57mQNN4"
+}
+~~~
+
+The server MUST verify that the request is signed by the account key of the Subscriber to which the certificate was originally issued. If the server accepts the request and the update succeeds, it responds with HTTP status code 200 (OK). If the update is rejected or fails, for example because the certificate has already been marked as replaced, the server returns an error.
+
+The server might use this renewal update to inform a number of processes, such as: not sending renewal reminder notifications for certificates that have been marked as replaced; sending empty or error responses to subsequent requests for the certificate's renewal information; or confidently revoking certificates subject to a mass revocation without fear of disrupting the Subscriber's operations.
+
 # Security Considerations
 
-The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555, section 10.1], Section 10.1.
+The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section Section 10.1.
 
 This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555’s requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
 
