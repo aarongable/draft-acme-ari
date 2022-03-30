@@ -102,7 +102,7 @@ To request the suggested renewal information for a certificate, the client sends
 
 The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with a forward slash and the base64url-encoded [@!RFC4648, section 5] bytes of a DER-encoded `CertID` ASN.1 sequence [@!RFC6960, section 4.1.1]. Trailing '=' characters MUST be stripped.
 
-For example, to request renewal information for the end-entity certificate given in Appendix A.1, issued by the intermediate certificate given in Appendix A.2, using SHA256, the client would make the following request (the path has been split onto multiple lines for readability):
+For example, to request renewal information for the end-entity certificate given in Appendix A.1, issued by the CA certificate given in Appendix A.2, using SHA256, the client would make the following request (the path has been split onto multiple lines for readability):
 
 ~~~ text
 GET https://example.com/acme/renewal-info/
