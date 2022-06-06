@@ -111,7 +111,7 @@ GET https://example.com/acme/renewal-info/
         eZ7pTS8jYCCD6jRWhlRB8c
 ~~~
 
-The ACME Server **MAY** restrict the hash algorithms which it accepts (for example, only allowing SHA256 to limit the number of potential cache keys); if it receives a request whose embedded `signatureAlgorithm` field contains an unacceptable OID, it **SHOULD** respond with HTTP status code 400 (Bad Request).
+The ACME Server **MAY** restrict the hash algorithms which it accepts (for example, only allowing SHA256 to limit the number of potential cache keys); if it receives a request whose embedded `hashAlgorithm` field contains an unacceptable OID, it **SHOULD** respond with HTTP status code 400 (Bad Request).
 
 The structure of an ACME `renewalInfo` resource is as follows:
 
