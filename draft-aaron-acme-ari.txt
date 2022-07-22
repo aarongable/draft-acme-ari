@@ -93,10 +93,15 @@ Table of Contents
    to load clustering for the issuing CA.
 
    Being able to indicate to the client a period in which the issuing CA
-   suggests renewal would allow both dynamic changes to the certificate
-   validity period and proactive distribution of load.  This document
-   specifies a mechanism by which ACME servers may provide suggested
-   renewal windows to ACME clients.
+   suggests renewal would allow for dynamic smearing of load, enabling a
+   CA to respond to exceptional circumstances.  For example, a CA could
+   suggest that clients renew prior to a mass-revocation event to
+   mitigate the impact of the revocation, or a CA could suggest that
+   clients renew earlier than they normally would to reduce the size of
+   an upcoming mass-renewal spike.
+
+   This document specifies a mechanism by which ACME servers may provide
+   suggested renewal windows to ACME clients.
 
 2.  Conventions and Definitions
 
