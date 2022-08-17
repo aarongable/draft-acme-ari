@@ -8,7 +8,7 @@ keyword = ["Internet-Draft"]
 
 [seriesInfo]
 name = "Internet-Draft"
-value = "draft-aaron-acme-ari-latest"
+value = "draft-ietf-acme-ari-latest"
 stream = "IETF"
 status = "standard"
 
