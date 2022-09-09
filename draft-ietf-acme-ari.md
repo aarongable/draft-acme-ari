@@ -255,7 +255,7 @@ o9q12g==
 ~~~
 
 {numbered="false"}
-## Example CA Certificate
+## A.2. Example CA Certificate
 
 ~~~ text
 -----BEGIN CERTIFICATE-----
