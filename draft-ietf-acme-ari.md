@@ -29,7 +29,17 @@ This document specifies how an ACME server may provide suggestions to ACME clien
 
 Draft note: this section will be removed by the editor before final publication.
 
-Let's Encrypt's Staging environment (available at [@lestaging], source at [@boulder]) implements this draft specification.
+Let's Encrypt's Production and Staging environments (available at [@leprod] and [@lestaging] respectively, and source code available at [@boulder]) implement this draft specification.
+
+<reference anchor='leprod' target='https://acme-v02.api.letsencrypt.org/directory'>
+    <front>
+        <title>Let's Encrypt Production Environment</title>
+        <author>
+            <organization>Internet Security Research Group</organization>
+        </author>
+        <date year='2023'/>
+    </front>
+</reference>
 
 <reference anchor='lestaging' target='https://acme-staging-v02.api.letsencrypt.org/directory'>
     <front>
@@ -37,7 +47,7 @@ Let's Encrypt's Staging environment (available at [@lestaging], source at [@boul
         <author>
             <organization>Internet Security Research Group</organization>
         </author>
-        <date year='2022'/>
+        <date year='2023'/>
     </front>
 </reference>
 
@@ -47,7 +57,7 @@ Let's Encrypt's Staging environment (available at [@lestaging], source at [@boul
         <author>
             <organization>Internet Security Research Group</organization>
         </author>
-        <date year='2022'/>
+        <date year='2023'/>
     </front>
 </reference>
 
