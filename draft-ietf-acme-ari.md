@@ -112,18 +112,18 @@ The "`renewalInfo`" resource is a new resource type introduced to ACME protocol.
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The full request URL is computed by concatenating the `renewalInfo` URL from the server's directory with a forward slash and the base64url-encoded [@!RFC4648, section 5] bytes of a DER-encoded `CertID` ASN.1 sequence [@!RFC6960, section 4.1.1]. Trailing '=' characters MUST be stripped.
+The path component is computed by concatenating the base64url-encoding [@!RFC4648, section 5] of the bytes of the certificate's Authority Key Identifier (AKI) extension value, a literal period, and the base64url-encoding of the bytes of the certificate's Serial Number. All trailing "`=`" MUST be stripped from both parts of the path component. Thus the full request url is constructed as follows, where the "`||`" operator indicates string concatenation:
 
-For example, to request renewal information for the end-entity certificate given in Appendix A.1, issued by the CA certificate given in Appendix A.2, using SHA256, the client would make the following request (the path has been split onto multiple lines for readability):
+~~~ text
+url = {renewalInfo url} || '/' || base64url(AKI) || '.' || base64url(Serial)
+~~~
+
+For example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the following request (the url has been split onto multiple lines for readability):
 
 ~~~ text
 GET https://example.com/acme/renewal-info/
-        MFswCwYJYIZIAWUDBAIBBCCeWLRusNLb--vmWOkxm34qDjTMWkc
-        3utIhOMoMwKDqbgQg2iiKWySZrD-6c88HMZ6vhIHZPamChLlzGH
-        eZ7pTS8jYCCD6jRWhlRB8c
+        OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw
 ~~~
-
-The ACME Server **MAY** restrict the hash algorithms which it accepts (for example, only allowing SHA256 to limit the number of potential cache keys); if it receives a request whose embedded `hashAlgorithm` field contains an unacceptable OID, it **SHOULD** respond with HTTP status code 400 (Bad Request).
 
 The structure of an ACME `renewalInfo` resource is as follows:
 
@@ -167,7 +167,7 @@ To update the renewal status of a certificate, the client sends a POST request t
 
 The body of the POST is a JWS object which is authenticated to an account as defined in [@!RFC8555], Section 6.2, and whose JSON payload has the following structure:
 
-certID (required, string): The `CertID` of the certificate whose renewal information should be updated, in the base64url-encoded version of the DER format with trailing "=" stripped. Note: this is identical to the final path component constructed for GET requests above.
+certID (required, string): A string identical to the path component computed for GET requests.
 
 replaced (required, boolean): Whether or not the client considers the certificate to have been replaced. A certificate is considered replaced when its revocation would not disrupt any ongoing services, for instance because it has been renewed and the new certificate is in use, or because it is no longer in use. Clients SHOULD NOT send a request where this value is false.
 
@@ -184,7 +184,7 @@ Content-Type: application/jose+json
     "url": "https://example.com/acme/renewal-info"
   }),
   "payload": base64url({
-    "certID": "MFswCwYJ...RWhlRB8c",
+    "certID": "OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw",
     "replaced": true
   }),
   "signature": "Q1bURgJoEslbD1c5...3pYdSMLio57mQNN4"
@@ -236,10 +236,7 @@ suggestedWindow | object     | This document
 {backmatter}
 
 {numbered="false"}
-# Appendix A. Example Certificates
-
-{numbered="false"}
-## A.1. Example End-Entity Certificate
+# Appendix A. Example Certificate
 
 ~~~ text
 -----BEGIN CERTIFICATE-----
@@ -261,32 +258,6 @@ TXysJCeyiGnR+KOOjOOQ9ZlO5JUK3OE4hagPLfaIpDDy6RXQt3ss0iNLuB1+IOtp
 1URpvffLZQ8xPsEgOZyPWOcabTwJrtqBwily+lwPFn2mChUx846LwQfxtsXU/lJg
 HX2RteNJx7YYNeX3Uf960mgo5an6vE8QNAsIoNHYrGyEmXDhTRe9mCHyiW2S7fZq
 o9q12g==
------END CERTIFICATE-----
-~~~
-
-{numbered="false"}
-## A.2. Example CA Certificate
-
-~~~ text
------BEGIN CERTIFICATE-----
-MIIDSzCCAjOgAwIBAgIIOhNWtJ7Igr0wDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UE
-AxMVbWluaWNhIHJvb3QgY2EgM2ExMzU2MCAXDTIyMDMxNzE3NTEwOVoYDzIxMjIw
-MzE3MTc1MTA5WjAgMR4wHAYDVQQDExVtaW5pY2Egcm9vdCBjYSAzYTEzNTYwggEi
-MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDc3P6cxcCZ7FQOQrYuigReSa8T
-IOPNKmlmX9OrTkPwjThiMNEETYKO1ea99yXPK36LUHC6OLmZ9jVQW2Ny1qwQCOy6
-TrquhnwKgtkBMDAZBLySSEXYdKL3r0jA4sflW130/OLwhstU/yv0J8+pj7eSVOR3
-zJBnYd1AqnXHRSwQm299KXgqema7uwsa8cgjrXsBzAhrwrvYlVhpWFSv3lQRDFQg
-c5Z/ZDV9i26qiaJsCCmdisJZWN7N2luUgxdRqzZ4Cr2Xoilg3T+hkb2y/d6ttsPA
-kaSA+pq3q6Qa7/qfGdT5WuUkcHpvKNRWqnwT9rCYlmG00r3hGgc42D/z1VvfAgMB
-AAGjgYYwgYMwDgYDVR0PAQH/BAQDAgKEMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggr
-BgEFBQcDAjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdDgQWBBQ4zzDRUaXHVKql
-STWkULGU4zGZpTAfBgNVHSMEGDAWgBQ4zzDRUaXHVKqlSTWkULGU4zGZpTANBgkq
-hkiG9w0BAQsFAAOCAQEArbDHhEjGedjb/YjU80aFTPWOMRjgyfQaPPgyxwX6Dsid
-1i2H1x4ud4ntz3sTZZxdQIrOqtlIWTWVCjpStwGxaC+38SdreiTTwy/nikXGa/6W
-ZyQRppR3agh/pl5LHVO6GsJz3YHa7wQhEhj3xsRwa9VrRXgHbLGbPOFVRTHPjaPg
-Gtsv2PN3f67DsPHF47ASqyOIRpLZPQmZIw6D3isJwfl+8CzvlB1veO0Q3uh08IJc
-fspYQXvFBzYa64uKxNAJMi4Pby8cf4r36Wnb7cL4ho3fOHgAltxdW8jgibRzqZpQ
-QKyxn2jX7kxeUDt0hFDJE8lOrhP73m66eBNzxe//FQ==
 -----END CERTIFICATE-----
 ~~~
 
