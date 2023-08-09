@@ -203,15 +203,9 @@ This document specifies that `renewalInfo` resources **MUST** be exposed and acc
 
 # IANA Considerations
 
-Draft note: The following changes to IANA registries have not yet been made.
-
-## New Registries
-
-Within the "Automated Certificate Management Environment (ACME) Protocol" registry, IANA has created the new "ACME Renewal Info Object Fields" registry (Section 6.4).
-
 ## ACME Resource Type
 
-Within the "Automated Certificate Management Environment (ACME) Protocol" registry, the following entry has been added to the "ACME Resource Types" registry.
+IANA will add the following entry to the "ACME Resource Types" registry within the "Automated Certificate Management Environment (ACME) Protocol" registry group at https://www.iana.org/assignments/acme:
 
 Field Name  | Resource Type       | Reference
 ------------|---------------------|-----------
@@ -219,7 +213,11 @@ renewalInfo | Renewal Info object | This document
 
 ## ACME Renewal Info Object Fields
 
-The "ACME Renewal Info Object Fields" registry lists field names that are defined for use in ACME renewal info objects.
+IANA will add the following new registry to the "Automated Certificate Management Environment (ACME) Protocol" registry group at https://www.iana.org/assignments/acme:
+
+Registry Name: ACME Renewal Info Object Fields
+
+Registration Procedure: Specification Required
 
 Template:
 
@@ -232,6 +230,7 @@ Initial contents:
 Field Name      | Field type | Reference
 ----------------|------------|-----------
 suggestedWindow | object     | This document
+explanationURL  | string     | This document
 
 {backmatter}
 
