@@ -1,0 +1,763 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2021-11-16T00:41:15.048144+00:00",
+  "repo": "aarongable/draft-acme-ari",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 3,
+      "id": "I_kwDOGGBRNc48nnmt",
+      "title": "Consider disallowing POST-as-GET for renewalInfo",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/3",
+      "state": "CLOSED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The renewalInfo objects are going to be queried very frequently, and their data is highly cacheable. The draft should take a stronger stance and disallow POST-as-GET entirely.\r\n\r\nThis was suggested during the [ACME WG interim meeting](https://datatracker.ietf.org/meeting/interim-2021-acme-01/materials/minutes-interim-2021-acme-01-202109291400-00), but I forget by which participant.",
+      "createdAt": "2021-10-05T23:06:45Z",
+      "updatedAt": "2021-10-26T23:54:47Z",
+      "closedAt": "2021-10-26T23:54:47Z",
+      "comments": [
+        {
+          "author": "jcjones",
+          "authorAssociation": "NONE",
+          "body": "Yes, this will be necessary for adoption.",
+          "createdAt": "2021-10-05T23:07:08Z",
+          "updatedAt": "2021-10-05T23:07:08Z"
+        },
+        {
+          "author": "jcjones",
+          "authorAssociation": "NONE",
+          "body": "Specifically, we wouldn't be able to roll this out unless it can be cached. The database load for also verifying an account signature on each renewal check -- which could be even more often than OCSP checks -- would be very difficult to manage without significant architecture changes. ",
+          "createdAt": "2021-10-06T00:16:52Z",
+          "updatedAt": "2021-10-06T00:16:52Z"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "I_kwDOGGBRNc48nrH0",
+      "title": "Make renewalInfo URLs third-party constructable",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/4",
+      "state": "CLOSED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "As suggested by @agwa (Andrew Ayer) [on the mailing list](https://mailarchive.ietf.org/arch/msg/acme/L-vaZbikL8rq5v5g3Aa-vqCA6uM/) and [in the WG interim meeting](https://datatracker.ietf.org/meeting/interim-2021-acme-01/materials/minutes-interim-2021-acme-01-202109291400-00), it would be useful for the renewalInfo URLs to be obtainable by means other than just being embedded in Order objects.\r\n\r\nOptions include:\r\n- put the renewalInfo url in the cert itself\r\n- put a base url in the directory, then combine that with a path slug derived from the cert itself\r\n\r\nThe former doesn't really work because there's not an available extension to use. We could define a new one, but I expect pushback against adding ~50 bytes to every cert that isn't useful to the vast majority of clients.\r\n\r\nThe latter has a few sub-options as well:\r\n- compute the slug as the fingerprint (sha-1 hash) of the whole cert\r\n- compute the slug similar to OCSP: issuer name hash, issuer pubkey hash, cert serial\r\n\r\nWe should figure out the best way to represent this, then modify the draft accordingly.",
+      "createdAt": "2021-10-05T23:17:42Z",
+      "updatedAt": "2021-10-26T23:55:20Z",
+      "closedAt": "2021-10-26T23:55:20Z",
+      "comments": []
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOGGBRNc48w9Fp",
+      "title": "Cleanups: use backticks everywhere appropriate",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/6",
+      "state": "CLOSED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "They get turned into nice fixed-width sections in the HTML output, and don't clutter up the plaintext output at all.",
+      "createdAt": "2021-10-06T23:43:38Z",
+      "updatedAt": "2021-11-05T21:30:42Z",
+      "closedAt": "2021-11-05T21:30:42Z",
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOGGBRNc48w9HP",
+      "title": "Show Retry-After header in example response",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/7",
+      "state": "CLOSED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2021-10-06T23:43:54Z",
+      "updatedAt": "2021-11-05T21:30:42Z",
+      "closedAt": "2021-11-05T21:30:42Z",
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOGGBRNc49cR1N",
+      "title": "How often to retry in the face of errors",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/8",
+      "state": "CLOSED",
+      "author": "jsha",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We should specify a little more about how hard clients should retry when they are inside the suggested window, and when the suggested window is in the past. Right now we say \"If the selected time is in the past, the client SHOULD attempt renewal immediately.\" But I can see that leading to implementations that retry really aggressively regardless of failures.\r\nWhat we want is more like: \"If the selected time is in the past, the client SHOULD consider the certificate eligible for immediate renewal, subject to the client's existing error backoffs and retry intervals.\"",
+      "createdAt": "2021-10-19T23:22:53Z",
+      "updatedAt": "2021-11-08T23:35:03Z",
+      "closedAt": "2021-11-08T23:35:02Z",
+      "comments": []
+    },
+    {
+      "number": 9,
+      "id": "I_kwDOGGBRNc49yXvU",
+      "title": "Clarify client and server behavior around malformed renewalInfo stanzas",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/9",
+      "state": "CLOSED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "- Is the time period inclusive of the \"end\" timestamp?\r\n- What happens if one of the timestamps is missing or malformed?\r\n- What happens if the client gets no response at all?",
+      "createdAt": "2021-10-26T18:31:02Z",
+      "updatedAt": "2021-11-08T23:59:01Z",
+      "closedAt": "2021-11-08T23:59:01Z",
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDOGGBRNc49zOVx",
+      "title": "Add draft-only section for Current Implementations",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/10",
+      "state": "CLOSED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Other drafts I've seen have sections pointing at current implementations, which get removed by the editor before leaving draft state. Let's add one pointing at the new implementation in Boulder.",
+      "createdAt": "2021-10-26T23:56:55Z",
+      "updatedAt": "2021-11-08T23:26:13Z",
+      "closedAt": "2021-11-08T23:26:13Z",
+      "comments": []
+    },
+    {
+      "number": 13,
+      "id": "I_kwDOGGBRNc4-dpfR",
+      "title": "Encourage clients to retry as often as possible",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/13",
+      "state": "OPEN",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The semantics of the `Retry-After` header only give us half of what we want: it delays clients, but doesn't also tell them to retry as soon after that period is over as they can. We should come up with a mechanism (a polling period in the directory? as its own key, as part of the renewalInfo key, or as part of the meta object? or maybe directly in the renewalInfo response object instead?) to more clearly communicate when we suggest that a client recheck the renewalInfo.",
+      "createdAt": "2021-11-08T21:55:54Z",
+      "updatedAt": "2021-11-08T21:55:54Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 15,
+      "id": "I_kwDOGGBRNc4-dtqb",
+      "title": "Consider a \"This has been renewed\" endpoint",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/15",
+      "state": "OPEN",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "One of the use-cases for ARI is being able to inform clients that they should renew ASAP, because the CA intends to revoke their certificate in the near future and would like to help the client avoid a service interruption.\r\n\r\nIn this case, it would be helpful for the CA to know when a client considers a cert to have been renewed (which may involve several newOrder and Finalize requests, in the case of validation/issuance failures, or certs with many identifiers having those identifiers shuffled between them) so that the cert can be safely revoked.\r\n\r\nSketch:\r\n```\r\nPOST /acme/renewal-info/<issuer-key-hash>/<issuer-name-hash>/<serial> HTTP/1.1\r\nHost: example.com\r\nContent-Type: application/jose+json\r\n\r\n{\r\n  \"protected\": base64url({\r\n    \"alg\": \"ES256\",\r\n    \"jwk\": {...},\r\n    \"nonce\": \"6S8IqOGY7eL2lsGoTZYifg\",\r\n    \"url\": \"https://example.com/acme/renewal-info/<issuer-key-hash>/<issuer-name-hash>/<serial>\"\r\n  }),\r\n  \"payload\": base64url({\r\n    \"renewed\": true,\r\n  }),\r\n  \"signature\": \"RZPOnYoPs1PhjszF...-nh6X1qtOFPB519I\"\r\n}\r\n```",
+      "createdAt": "2021-11-08T22:16:43Z",
+      "updatedAt": "2021-11-15T16:20:56Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "jesperkristensen",
+          "authorAssociation": "NONE",
+          "body": "This seems similar to if the client revokes the certificate with reason code \"superseded\" using the existing ACME endpoint. So why is a new endpoint needed?\r\n\r\nArguments against always revoking may be that the certificate could be still in use by the time the ACME client thinks renewal is complete, because of eventual consistency. Or because the certificate may be later restored from a backup. But those concerns would apply to this new renewed endpoint as well.\r\n\r\nI guess the new endpoint allows the CA more flexibility in choosing when to revoke based on a risk vs. reward trade-off.\r\n\r\nWould Let's Encrypt consider not sending renewal reminder emails for certificates that are marked as renewed using this API?",
+          "createdAt": "2021-11-13T07:55:42Z",
+          "updatedAt": "2021-11-13T07:55:42Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Ooh that's a really good point; I'd forgotten about the \"superseded\" reason code. That may be all that's necessary here -- it is the same number of total requests to the ACME server, accomplishes the goal of revocation, and provides a clear indication of why revocation happened. It *is* less flexible than the new API proposed above, which would allow a CA to decide when and whether to revoke. But honestly maybe encouraging the whole ecosystem to move to \"renew then revoke\" in all circumstances is a good thing.\r\n\r\nI think concerns about eventual consistency are valid. In particular, there may be clients which are concerned about exactly that, and so choose to never revoke the recently-replaced cert. And that model would be fine in most circumstances... until a mass revocation event happens and the CA doesn't know when it is \"okay\" to revoke the old cert.\r\n\r\nYes, today LE has to decide whether or not to send a renewal reminder based on a very rough heuristic. If confirmation of renewal existed -- either in the form of the proposed new API call, or in the form of the old cert being revoked as superseded -- that heuristic could be greatly improved.",
+          "createdAt": "2021-11-15T16:20:56Z",
+          "updatedAt": "2021-11-15T16:20:56Z"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOGGBRNc4-pg9u",
+      "title": "Include justification of sha1 in Security Considerations",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/16",
+      "state": "OPEN",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The choice to mandate sha1 for the issuer name hash and issuer key hash is based on rfc5019 \"Lightweight OCSP Profile\" and the fact that the purpose of the hash is non-cryptographic. Include a sentence or two with this same info in the security considerations section.",
+      "createdAt": "2021-11-11T15:02:01Z",
+      "updatedAt": "2021-11-11T15:02:01Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOGGBRNc4-pldP",
+      "title": "Consider `base64url(CertID)` for url slug",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/17",
+      "state": "OPEN",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently, renewalInfo URLs are constructed as\r\n```\r\n[directory base path] / hex(sha1(issuer name)) / hex(sha1(issuer key)) / hex(serial)\r\n```\r\n\r\nThis mandates SHA1, which on the one hand is in-line with RFC5019 \"Lightweight OCSP Profile\", but on the other hand mandates an out-of-date hashing algorithm.\r\n\r\nThis could instead be formulated as\r\n```\r\n[directory base path] / base64url(CertID)\r\n```\r\nwhere `CertID` is the ASN.1 Sequence specified in RFC6960\r\n```\r\n   CertID          ::=     SEQUENCE {\r\n       hashAlgorithm       AlgorithmIdentifier,\r\n       issuerNameHash      OCTET STRING, -- Hash of issuer's DN\r\n       issuerKeyHash       OCTET STRING, -- Hash of issuer's public key\r\n       serialNumber        CertificateSerialNumber }\r\n```\r\n\r\nThis would allow different ACME servers to set different policies around what hash algorithms they accept, and would allow some amount of agility around hash algorithms in the future. On the other hand, it would make requests relatively opaque (can't tell from the URL alone what issuer is being requested, due to the base64url encoding), it would make requests larger (due to the ans.1 and encoding overhead), and it would directly couple this spec to OCSP instead of just borrowing its ideas.",
+      "createdAt": "2021-11-11T15:19:50Z",
+      "updatedAt": "2021-11-11T15:19:50Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOGGBRNc4sKZ8o",
+      "title": "Add -latest to mmark seriesinfo block",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/1",
+      "state": "MERGED",
+      "author": "martinthomson",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I don't know mmark very well, but this seems to result in the version number getting put in the XML \"properly\" (it's not properly, but xml2rfc seems to manage it well enough).",
+      "createdAt": "2021-09-22T23:04:40Z",
+      "updatedAt": "2021-09-23T00:02:13Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "4df062dcc1e637df4cbc21945df8ec44abac4884",
+      "headRepository": "martinthomson/draft-acme-ari",
+      "headRefName": "fix-latest",
+      "headRefOid": "07df018eb9ab4d7271a48c60dde042d1c2eab1cf",
+      "closedAt": "2021-09-22T23:43:12Z",
+      "mergedAt": "2021-09-22T23:43:12Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "903d7c4dc8cf9dbd571311bb31bfda2e557be905"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc4tY3zm",
+          "commit": {
+            "abbreviatedOid": "07df018"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2021-09-22T23:40:53Z",
+          "updatedAt": "2021-09-22T23:40:53Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOGGBRNc4sugPL",
+      "title": "Construct renewalInfo URLs from directory+fingerprint",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/2",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Instead of providing renewalInfo URLs inside order objects, requiring\r\nthe ACME client to persist the URL in order to query it on a regular\r\nbasis, allow renewalInfo URLs to be constructable given only existing\r\nclient configuration (i.e. the URL of the directory) and the certificate\r\nitself.\r\n\r\nThis allows stateless clients to not need to persist additional data,\r\nand allows external monitoring tools to poll for renewal information\r\nwithout being privy to order objects, at the cost of requiring two API\r\ncalls (one for the directory, one for the renewalInfo) each time a\r\nclient checks in.\r\n\r\nPart of #4",
+      "createdAt": "2021-10-05T22:01:25Z",
+      "updatedAt": "2021-10-26T23:41:41Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "d4f774fbe92e0245fdff2a2ac7ac7082c4392237",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "constructed-urls",
+      "headRefOid": "8273e4cec289358aba33134367ee110d0b11fba9",
+      "closedAt": "2021-10-26T23:41:40Z",
+      "mergedAt": "2021-10-26T23:41:40Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "e7a4e03b1c81f1823bc6f6c3692d13ccd5aeb73d"
+      },
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "> Looks good! We should clarify a bit what we mean by hex-encoded: is lowercase acceptable?\r\n\r\nGood call. I've pulled \"case-insensitive hex-encoded\" out of the three bullet points to the paragraph above, and referenced RFC 4648, Section 8, for that.",
+          "createdAt": "2021-10-26T23:39:03Z",
+          "updatedAt": "2021-10-26T23:39:03Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc4uBLCu",
+          "commit": {
+            "abbreviatedOid": "4ca27fe"
+          },
+          "author": "pgporada",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-10-05T23:03:38Z",
+          "updatedAt": "2021-10-05T23:03:38Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "A client calling `/directory` should receive the renewal period advertised by the CA e.g. 12h. Maybe this is what `renewalInfo` does?",
+              "createdAt": "2021-10-05T23:03:38Z",
+              "updatedAt": "2021-10-05T23:05:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4uBL__",
+          "commit": {
+            "abbreviatedOid": "4ca27fe"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-10-05T23:11:39Z",
+          "updatedAt": "2021-10-05T23:11:40Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Interesting, we could include that in directory metadata. Right now, this draft has the server's suggested check-in interval instead provided by the Retry-After header on the `renewalInfo` endpoint itself.",
+              "createdAt": "2021-10-05T23:11:40Z",
+              "updatedAt": "2021-10-05T23:11:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4uBOGq",
+          "commit": {
+            "abbreviatedOid": "4ca27fe"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-10-05T23:30:26Z",
+          "updatedAt": "2021-10-05T23:30:26Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "I think I should instead mandate that the renewalInfo URL in the directory end with a slash.",
+              "createdAt": "2021-10-05T23:30:26Z",
+              "updatedAt": "2021-10-05T23:30:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4uEvUe",
+          "commit": {
+            "abbreviatedOid": "4ca27fe"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-10-06T16:53:18Z",
+          "updatedAt": "2021-10-06T16:53:19Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "Also, my first implementation (https://github.com/letsencrypt/boulder/pull/5691) uses the same arguments as OCSP (issuerKeyHash, issuerNameHash, certificateSerial) instead of the full certificate fingerprint, because that's much easier for Let's Encrypt's specific setup. Should consider whether that is a better approach for everyone overall, too.",
+              "createdAt": "2021-10-06T16:53:18Z",
+              "updatedAt": "2021-10-06T16:53:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4uFsel",
+          "commit": {
+            "abbreviatedOid": "4ca27fe"
+          },
+          "author": "jsha",
+          "authorAssociation": "NONE",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2021-10-06T21:29:45Z",
+          "updatedAt": "2021-10-06T21:32:10Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "I think `newNonce` here should be `renewalInfo` instead, right?\r\n\r\n```suggestion\r\nrenewalInfo   | Renewal info\r\n```",
+              "createdAt": "2021-10-06T21:29:45Z",
+              "updatedAt": "2021-10-06T21:32:10Z"
+            },
+            {
+              "originalPosition": 70,
+              "body": "Let's make the standard use the same arguments (issuerKeyHash, issuerNameHash, certificateSerial). We know all CAs need a cheap way to index off of those fields, so I suspect it will be a good approach for everyone.",
+              "createdAt": "2021-10-06T21:31:37Z",
+              "updatedAt": "2021-10-06T21:32:10Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4uF82G",
+          "commit": {
+            "abbreviatedOid": "4ca27fe"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-10-06T23:19:35Z",
+          "updatedAt": "2021-10-06T23:19:35Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "d'oh thanks, copy-paste error.",
+              "createdAt": "2021-10-06T23:19:35Z",
+              "updatedAt": "2021-10-06T23:19:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4uKGOR",
+          "commit": {
+            "abbreviatedOid": "8369115"
+          },
+          "author": "jsha",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "Looks good! We should clarify a bit what we mean by hex-encoded: is lowercase acceptable?",
+          "createdAt": "2021-10-07T21:09:06Z",
+          "updatedAt": "2021-10-07T21:09:06Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDOGGBRNc4su5my",
+      "title": "Require unauthenticated GET for renewalInfo requests",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/5",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Do not allow POST-as-GET for accessing renewalInfo resources; instead\r\nrequire that servers only expose the resource via GET, and that clients\r\nonly query the resource via GET.\r\n\r\nThis reduces the possible implementation space for clients, simplifying\r\nthe work for client maintainers. It also ensures that the renewalInfo\r\nresponses can be easily cached, allowing server operators to minimize\r\nthe burden of supporting this draft.\r\n\r\nFixes #3",
+      "createdAt": "2021-10-05T23:25:06Z",
+      "updatedAt": "2021-10-26T23:54:48Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "e7a4e03b1c81f1823bc6f6c3692d13ccd5aeb73d",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "only-get",
+      "headRefOid": "2affe0828ef920f721a8581a976ee4d0e689cea2",
+      "closedAt": "2021-10-26T23:54:47Z",
+      "mergedAt": "2021-10-26T23:54:47Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "885cab22773118af048de1e876466c28d85f72c8"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc4uFtvL",
+          "commit": {
+            "abbreviatedOid": "0683f4e"
+          },
+          "author": "jsha",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2021-10-06T21:37:13Z",
+          "updatedAt": "2021-10-06T21:37:13Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDOGGBRNc4uPzPv",
+      "title": "Add current implementations section",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/11",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #10",
+      "createdAt": "2021-11-08T19:34:12Z",
+      "updatedAt": "2021-11-08T23:26:13Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "1a3f8503e04b44911429789fbe2d4cbe57ad4f21",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "curr-impl",
+      "headRefOid": "7abc990fb6076d86855980e4ab4aa74a1771dc0a",
+      "closedAt": "2021-11-08T23:26:13Z",
+      "mergedAt": "2021-11-08T23:26:13Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "e9960911d9326f4afb61516289b6f51d33af6038"
+      },
+      "comments": [
+        {
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Looks good to me.",
+          "createdAt": "2021-11-08T22:50:40Z",
+          "updatedAt": "2021-11-08T22:50:47Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc4vuUW1",
+          "commit": {
+            "abbreviatedOid": "7abc990"
+          },
+          "author": "andygabby",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-11-08T22:30:28Z",
+          "updatedAt": "2021-11-08T22:30:32Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "I'm not sure if this renders how you want it to. In my markdown preview I just get:\r\n```\r\nInternet Security Research Group\r\nInternet Security Research Group\r\n```\r\nIn Github something a bit different.",
+              "createdAt": "2021-11-08T22:30:28Z",
+              "updatedAt": "2021-11-08T22:30:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4vuXgQ",
+          "commit": {
+            "abbreviatedOid": "7abc990"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-11-08T22:50:36Z",
+          "updatedAt": "2021-11-08T22:50:36Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "I think this gets reprocessed by some tools on its way to becoming an uploadable draft. In plain Markdown, HTML tags gets passed straight through, but these tags don't have meaning in HTML (with the exception of `<title>`, which the browser probably says \"wat??\" upon seeing in the middle of a `<body>`)",
+              "createdAt": "2021-11-08T22:50:36Z",
+              "updatedAt": "2021-11-08T22:50:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4vucVX",
+          "commit": {
+            "abbreviatedOid": "7abc990"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-11-08T23:25:05Z",
+          "updatedAt": "2021-11-08T23:25:05Z",
+          "comments": [
+            {
+              "originalPosition": 28,
+              "body": "Yeah, for better or worse, although this file is essentially markdown, it's not _rendered_ using markdown. The render pipeline is `markdown --mmark-> xml --xml2rfc-> rfc`, so what actually matters is what text and html output the render pipeline produces. You can see previews for each pull request on the github pages site for this repo: https://aarongable.github.io/draft-acme-ari/\r\n\r\nThis one is specifically https://aarongable.github.io/draft-acme-ari/curr-impl/draft-aaron-acme-ari.html, which you can see renders these inline as `[lestaging]` and `[boulder]`, with new matching Informative References at the bottom.",
+              "createdAt": "2021-11-08T23:25:05Z",
+              "updatedAt": "2021-11-08T23:25:05Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "PR_kwDOGGBRNc4uP0FQ",
+      "title": "Clarify client backoff/retry expectations",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/12",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #8",
+      "createdAt": "2021-11-08T19:39:21Z",
+      "updatedAt": "2021-11-08T23:35:04Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "1a3f8503e04b44911429789fbe2d4cbe57ad4f21",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "retry-behavior",
+      "headRefOid": "0b7fe3d6c6ef6745a7d7f4c0f05cb72f6acf9b5a",
+      "closedAt": "2021-11-08T23:35:03Z",
+      "mergedAt": "2021-11-08T23:35:02Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "97b98d6e4cb90f74e597c0f490a4e224caef48a0"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc4vuWZK",
+          "commit": {
+            "abbreviatedOid": "d387a0b"
+          },
+          "author": "andygabby",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-11-08T22:43:11Z",
+          "updatedAt": "2021-11-08T22:44:33Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Would it be important to specify \"polling interval or datetime\"? Or refer to the specification for `Retry-After` that a client should use? (I realize this is adding some formatting bits to the existing wording, but thought it worth mentioning)",
+              "createdAt": "2021-11-08T22:43:11Z",
+              "updatedAt": "2021-11-08T22:44:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4vuYLu",
+          "commit": {
+            "abbreviatedOid": "d387a0b"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "It's useful to be really explicit about expectations or people won't get it. Added some suggested verbiage specific to cron-based clients.",
+          "createdAt": "2021-11-08T22:55:21Z",
+          "updatedAt": "2021-11-08T22:55:49Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "```suggestion\r\nConforming clients **MUST** select a uniform random time within the suggested window to attempt to renew the certificate. If the selected time is in the past, the client **SHOULD** attempt renewal immediately. If the selected time is in the future, but before the next time that the client would wake up normally, the client **MAY** attempt renewal immediately. In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.\r\n\r\nIn particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.\r\n```",
+              "createdAt": "2021-11-08T22:55:21Z",
+              "updatedAt": "2021-11-08T22:55:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4vuc04",
+          "commit": {
+            "abbreviatedOid": "d387a0b"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2021-11-08T23:28:59Z",
+          "updatedAt": "2021-11-08T23:28:59Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Yeah, I'm gonna leave this one as-is for now, but I've already filed https://github.com/aarongable/draft-acme-ari/issues/13 because I know this language isn't how I want it to be.",
+              "createdAt": "2021-11-08T23:28:59Z",
+              "updatedAt": "2021-11-08T23:28:59Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "id": "PR_kwDOGGBRNc4uQLzE",
+      "title": "Clarify client behavior for malformed renewalInfo",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/14",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #9",
+      "createdAt": "2021-11-08T21:57:21Z",
+      "updatedAt": "2021-11-08T23:59:02Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "97b98d6e4cb90f74e597c0f490a4e224caef48a0",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "malformed-behavior",
+      "headRefOid": "9b8dc181749678b534c195716e770830c85eceba",
+      "closedAt": "2021-11-08T23:59:01Z",
+      "mergedAt": "2021-11-08T23:59:01Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "57dbbd6f1ab506bf67b08785dcf5cb347615d498"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc4vuWtx",
+          "commit": {
+            "abbreviatedOid": "43c9aef"
+          },
+          "author": "andygabby",
+          "authorAssociation": "NONE",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2021-11-08T22:45:26Z",
+          "updatedAt": "2021-11-08T22:45:26Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOGGBRNc4vuYVm",
+          "commit": {
+            "abbreviatedOid": "43c9aef"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2021-11-08T22:56:26Z",
+          "updatedAt": "2021-11-08T22:56:26Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
