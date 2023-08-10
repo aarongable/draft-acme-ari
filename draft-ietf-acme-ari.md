@@ -112,17 +112,23 @@ The "`renewalInfo`" resource is a new resource type introduced to ACME protocol.
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The path component is computed by concatenating the base64url-encoding [@!RFC4648, section 5] of the bytes of the certificate's Authority Key Identifier (AKI) extension value, a literal period, and the base64url-encoding of the bytes of the certificate's Serial Number. All trailing "`=`" **MUST** be stripped from both parts of the path component. Thus the full request url is constructed as follows, where the "`||`" operator indicates string concatenation:
+The path component is a unique identifier for the certificate in question. The unique identifer is constructed by concatenating the base64url-encoding [@!RFC4648, section 5] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280, section 4.2.1.1] extension, a literal period, and the base64url-encoding of the bytes of the certificate's Serial Number value. All trailing "`=`" MUST be stripped from both parts of the unique identifier.
+
+Thus the full request url is constructed as follows, where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
 
 ~~~ text
-url = {renewalInfo url} || '/' || base64url(AKI) || '.' || base64url(Serial)
+url = renewalInfo || '/' || base64url(AKI) || '.' || base64url(Serial)
 ~~~
 
-For example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the following request (the url has been split onto multiple lines for readability):
+For example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the request as follows:
+
+1. The `keyIdentifier` field of the certificate's AKI extension has the bytes `38:CF:30:D1:51:A5:C7:54:AA:A5:49:35:A4:50:B1:94:E3:31:99:A5` as its ASN.1 Octet String value. The base64url encoding of those bytes is `OM8w0VGlx1SqpUk1pFCxlOMxmaU=`.
+2. The certificate's Serial Number field has the bytes `3E:A3:45:68:65:44:1F:1C` as its ASN.1 Integer value. The base64url encoding of those bytes is `PqNFaGVEHxw=`.
+3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw`, and the client makes the request (split onto multiple lines for readability):
 
 ~~~ text
 GET https://example.com/acme/renewal-info/
-        OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw
+      OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw
 ~~~
 
 ## RenewalInfo Objects
@@ -143,7 +149,7 @@ Retry-After: 21600
     "start": "2021-01-03T00:00:00Z",
     "end": "2021-01-07T00:00:00Z"
   },
-  "explanationURL": "https://example.com/docs/example-mass-reissuance-event"
+  "explanationURL": "https://example.com/docs/ari"
 }
 ~~~
 
@@ -168,7 +174,7 @@ If the client receives no response or a malformed response (e.g. an `end` timest
 In order to convey information regarding which certificate requests represent
 renewals of previous certificates, a new field is added to the Order object:
 
-`replaces` (string, optional): A string identifying a previously-issued certificate which this order is intended to replace. This string is computed in the same way as the path component for GET requests described above.
+`replaces` (string, optional): A string uniquely identifying a previously-issued certificate which this order is intended to replace. This unique identifier is constructed in the same way as the path component for GET requests described above.
 
 Clients **SHOULD** include this field in New Order requests if there is a clear predecessor certificate, as is the case for most certificate renewals.
 
