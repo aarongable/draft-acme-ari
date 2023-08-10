@@ -200,7 +200,7 @@ Content-Type: application/jose+json
 }
 ~~~
 
-Servers **SHOULD** check that the identified certificate and the current New Order request correspond to the same ACME Account and share a preponderance of identifiers. Servers **MAY** reject New Order requests which identify a certificate that does not pass such checks, or which has already been replaced by a different finalized Order.
+Servers **SHOULD** check that the identified certificate and the current New Order request correspond to the same ACME Account and share a preponderance of identifiers, and that the identified certificate has not already been marked as replaced by a different finalized Order. Servers **MAY** ignore the `replaces` field in New Order requests which do not pass such checks.
 
 It is suggested that Servers should use this information to grant New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such.
 
