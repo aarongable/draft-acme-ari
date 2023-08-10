@@ -75,7 +75,7 @@ This document specifies a mechanism by which ACME servers may provide suggested 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@!RFC2119;@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-# Extensions to the ACME Protocol: The "directory" Resource
+# Extensions to the Directory Object
 
 An ACME server which wishes to provide renewal information **MUST** include a new field, `renewalInfo`, in its directory object.
 
@@ -104,11 +104,11 @@ Content-Type: application/json
 }
 ~~~
 
-# Extensions to the ACME Protocol: The "renewalInfo" Resource
+# Getting Renewal Information
+
+## The "renewalInfo" Resource
 
 The "`renewalInfo`" resource is a new resource type introduced to ACME protocol. This new resource both allows clients to query the server for suggestions on when they should renew certificates, and allows clients to inform the server when they have completed renewal (or otherwise replaced the certificate to their satisfaction).
-
-## Getting Renewal Information
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
@@ -130,6 +130,8 @@ For example, to request renewal information for the end-entity certificate given
 GET https://example.com/acme/renewal-info/
       OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw
 ~~~
+
+## RenewalInfo Objects
 
 The structure of an ACME `renewalInfo` resource is as follows:
 
@@ -167,18 +169,17 @@ In particular, cron-based clients may find they need to increase their run frequ
 
 If the client receives no response or a malformed response (e.g. an `end` timestamp which is equal to or precedes the `start` timestamp), it **SHOULD** make its own determination of when to renew the certificate, and **MAY** retry the `renewalInfo` request with appropriate exponential backoff behavior.
 
-## Updating Renewal Information
+# Extensions to the Order Object
 
-To update the renewal status of a certificate, the client sends a POST request to the server's `renewalInfo` URL.
+In order to convey information regarding which certificate requests represent
+renewals of previous certificates, a new field is added to the Order object:
 
-The body of the POST is a JWS object which is authenticated to an account as defined in [@!RFC8555], Section 6.2, and whose JSON payload has the following structure:
+`replaces` (string, optional): A string uniquely identifying a previously-issued certificate which this order is intended to replace. This unique identifier is constructed in the same way as the path component for GET requests described above.
 
-certID (required, string): A string identical to the path component computed for GET requests.
-
-replaced (required, boolean): Whether or not the client considers the certificate to have been replaced. A certificate is considered replaced when its revocation would not disrupt any ongoing services, for instance because it has been renewed and the new certificate is in use, or because it is no longer in use. Clients SHOULD NOT send a request where this value is false.
+Clients **SHOULD** include this field in New Order requests if there is a clear predecessor certificate, as is the case for most certificate renewals.
 
 ~~~ text
-POST /acme/renewal-info HTTP/1.1
+POST /acme/new-order HTTP/1.1
 Host: example.com
 Content-Type: application/jose+json
 
@@ -186,20 +187,22 @@ Content-Type: application/jose+json
   "protected": base64url({
     "alg": "ES256",
     "kid": "https://example.com/acme/acct/evOfKhNU60wg",
-    "nonce": "JHb54aT_KTXBWQOzGYkt9A",
-    "url": "https://example.com/acme/renewal-info"
+    "nonce": "5XJ1L3lEkMG7tR6pA00clA",
+    "url": "https://example.com/acme/new-order"
   }),
   "payload": base64url({
-    "certID": "OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw",
-    "replaced": true
+    "identifiers": [
+      { "type": "dns", "value": "example.com" }
+    ],
+    "replaces": "OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw"
   }),
-  "signature": "Q1bURgJoEslbD1c5...3pYdSMLio57mQNN4"
+  "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
 }
 ~~~
 
-The server MUST verify that the request is signed by the account key of the Subscriber to which the certificate was originally issued. If the server accepts the request and the update succeeds, it responds with HTTP status code 200 (OK). If the update is rejected or fails, for example because the certificate has already been marked as replaced, the server returns an error.
+Servers **SHOULD** check that the identified certificate and the current New Order request correspond to the same ACME Account and share a preponderance of identifiers, and that the identified certificate has not already been marked as replaced by a different finalized Order. Servers **MAY** ignore the `replaces` field in New Order requests which do not pass such checks.
 
-The server might use this renewal update to inform a number of processes, such as: not sending renewal reminder notifications for certificates that have been marked as replaced; sending empty or error responses to subsequent requests for the certificate's renewal information; or confidently revoking certificates subject to a mass revocation without fear of disrupting the Subscriber's operations.
+It is suggested that Servers should use this information to grant New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such.
 
 # Security Considerations
 
@@ -211,7 +214,7 @@ This document specifies that `renewalInfo` resources **MUST** be exposed and acc
 
 ## ACME Resource Type
 
-IANA will add the following entry to the "ACME Resource Types" registry within the "Automated Certificate Management Environment (ACME) Protocol" registry group at https://www.iana.org/assignments/acme:
+IANA will add the following entry to the "ACME Resource Types" registry within the "Automated Certificate Management Environment (ACME) Protocol" registry group at <https://www.iana.org/assignments/acme>:
 
 Field Name  | Resource Type       | Reference
 ------------|---------------------|-----------
@@ -219,7 +222,7 @@ renewalInfo | Renewal Info object | This document
 
 ## ACME Renewal Info Object Fields
 
-IANA will add the following new registry to the "Automated Certificate Management Environment (ACME) Protocol" registry group at https://www.iana.org/assignments/acme:
+IANA will add the following new registry to the "Automated Certificate Management Environment (ACME) Protocol" registry group at <https://www.iana.org/assignments/acme>:
 
 Registry Name: ACME Renewal Info Object Fields
 
@@ -237,6 +240,14 @@ Field Name      | Field type | Reference
 ----------------|------------|-----------
 suggestedWindow | object     | This document
 explanationURL  | string     | This document
+
+## ACME Order Object Fields
+
+IANA will add the following entry to the "ACME Order Object Fields" registry within the "Automated Certificate Management Environment (ACME) Protocol" registry group at <https://www.iana.org/assignments/acme>:
+
+Field Name  | Field Type | Configurable | Reference
+------------|------------|--------------|-----------
+replaces    | string     | true         | This document
 
 {backmatter}
 
