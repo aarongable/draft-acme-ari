@@ -29,37 +29,7 @@ This document specifies how an ACME server may provide suggestions to ACME clien
 
 Draft note: this section will be removed by the editor before final publication.
 
-Let's Encrypt's Production and Staging environments (available at [@leprod] and [@lestaging] respectively, and source code available at [@boulder]) implement this draft specification.
-
-<reference anchor='leprod' target='https://acme-v02.api.letsencrypt.org/directory'>
-    <front>
-        <title>Let's Encrypt Production Environment</title>
-        <author>
-            <organization>Internet Security Research Group</organization>
-        </author>
-        <date year='2023'/>
-    </front>
-</reference>
-
-<reference anchor='lestaging' target='https://acme-staging-v02.api.letsencrypt.org/directory'>
-    <front>
-        <title>Let's Encrypt Staging Environment</title>
-        <author>
-            <organization>Internet Security Research Group</organization>
-        </author>
-        <date year='2023'/>
-    </front>
-</reference>
-
-<reference anchor='boulder' target='https://github.com/letsencrypt/boulder'>
-    <front>
-        <title>Boulder</title>
-        <author>
-            <organization>Internet Security Research Group</organization>
-        </author>
-        <date year='2023'/>
-    </front>
-</reference>
+Let's Encrypt's [Boulder](https://github.com/letsencrypt/boulder) software fully implements the server side of an earlier version of this draft, and that implementation is deployed in both the [Production](https://acme-v02.api.letsencrypt.org/directory) and [Staging](https://acme-staging-v02.api.letsencrypt.org/directory) environments. Google Trust Services has [done the same](https://security.googleblog.com/2023/05/google-trust-services-acme-api_0503894189.html). Client implementations include [Lego](https://github.com/go-acme/lego), [eggsampler](https://github.com/eggsampler/acme), [ACMEz](https://github.com/mholt/acmez), and [win-acme](https://github.com/win-acme/win-acme).
 
 {mainmatter}
 
