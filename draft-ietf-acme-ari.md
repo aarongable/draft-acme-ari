@@ -141,6 +141,8 @@ If the client receives no response or a malformed response (e.g. an `end` timest
 
 # Extensions to the Order Object
 
+## Extending ACME Order Objects with Certificate Lineage Information
+
 In order to convey information regarding which certificate requests represent
 renewals of previous certificates, a new field is added to the Order object:
 
@@ -173,6 +175,42 @@ Content-Type: application/jose+json
 Servers **SHOULD** check that the identified certificate and the current New Order request correspond to the same ACME Account and share a preponderance of identifiers, and that the identified certificate has not already been marked as replaced by a different finalized Order. Servers **MAY** ignore the `replaces` field in New Order requests which do not pass such checks.
 
 It is suggested that Servers should use this information to grant New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such.
+
+## Extending ACME Order Objects with ARI Payloads
+
+An ACME server wishing to provide renewal information **SHOULD** additionally extend ACME Order Objects with an initial payload of suggested renewal information to preclude ACME clients from having to immediately make a subsequent call to the Server's `renewalInfo` URL for this information.
+
+The server **SHOULD** extend the ACME Order Object [@!RFC8555, section 7.1.3] with a new field `renewalInfo` containing the same paylod as provided by the `renewalInfo` resource, with the addition of a `retryAfter` field to contain the information provided in the `Retry-After` header.  The server **SHOULD NOT** include this field until a certificate has been issued and the `certificate` field is populated in the Order object.
+
+
+   renewalInfo (optional, object):
+
+        `suggestedWindow` (object, required): A JSON object as defined in the aforementioned `renewalInfo` resource
+
+        `explanationURL` (string, optional): A URL as defined in the aforementioned `renewalInfo` resource
+
+        `retryAfter` (string, optional): A string in the format of a `Retry-After` header, as defined in the aforementioned `renewalInfo` resource.
+
+
+~~~ json
+"renewalInfo": {
+      "suggestedWindow": {
+        "start": "2021-01-03T00:00:00Z",
+        "end": "2021-01-07T00:00:00Z"
+      },
+      "explanationURL": "https://example.com/docs/example-mass-reissuance-event",
+      "Retry-After: 21600"
+    }
+}
+~~~
+
+Conforming clients **SHOULD** check order objects for the presence of a `renewalInfo` field upon Certificate issuance.  If the field is present, the client **SHOULD** act as if the payload were provided as an initial ARI request.
+
+# Interoperability Considerations
+
+This document describes the addition of "Automated Renewal Information" to ACME [@!RFC8555], "an extensible framework for automating the issuance and domain validation procedure". Specifically, the document details the addition of a `renewalInfo` resource to the ACME `directory` object [@!RFC8555, section 7.1.1], and the `renewalInfo` and `replaces` fields to the ACME Order Object [@!RFC8555, section 7.1.3].
+
+The optional extensions described in this document do not alter the functionality of [@!RFC8555]. [@!RFC8555] also notes in several contexts that unsupported or unknown fields should be ignored by both clients and servers.
 
 # Security Considerations
 
@@ -217,6 +255,7 @@ IANA will add the following entry to the "ACME Order Object Fields" registry wit
 
 Field Name  | Field Type | Configurable | Reference
 ------------|------------|--------------|-----------
+renewalInfo | object     | true         | This document
 replaces    | string     | true         | This document
 
 {backmatter}
