@@ -82,7 +82,7 @@ The "`renewalInfo`" resource is a new resource type introduced to ACME protocol.
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The path component is a unique identifier for the certificate in question. The unique identifer is constructed by concatenating the base64url-encoding [@!RFC4648, section 5] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280, section 4.2.1.1] extension, a literal period, and the base64url-encoding of the bytes of the certificate's Serial Number value. All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
+The path component is a unique identifier for the certificate in question. The unique identifer is constructed by concatenating the base64url-encoding [@!RFC4648, section 5] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280, section 4.2.1.1] extension, a literal period, and the base64url-encoding of the bytes of the DER encoding of the certificate's Serial Number (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
 
 Thus the full request url is constructed as follows, where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
 
@@ -92,13 +92,13 @@ url = renewalInfo || '/' || base64url(AKI) || '.' || base64url(Serial)
 
 For example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the request as follows:
 
-1. The `keyIdentifier` field of the certificate's AKI extension has the bytes `38:CF:30:D1:51:A5:C7:54:AA:A5:49:35:A4:50:B1:94:E3:31:99:A5` as its ASN.1 Octet String value. The base64url encoding of those bytes is `OM8w0VGlx1SqpUk1pFCxlOMxmaU=`.
-2. The certificate's Serial Number field has the bytes `3E:A3:45:68:65:44:1F:1C` as its ASN.1 Integer value. The base64url encoding of those bytes is `PqNFaGVEHxw=`.
-3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw`, and the client makes the request (split onto multiple lines for readability):
+1. The `keyIdentifier` field of the certificate's AKI extension has the hexadecimal bytes `69:88:5B:6B:87:46:40:41:E1:B3:7B:84:7B:A0:AE:2C:DE:01:C8:D4` as its ASN.1 Octet String value. The base64url encoding of those bytes is `aYhba4dGQEHhs3uEe6CuLN4ByNQ=`.
+2. The certificate's Serial Number field has the hexadecimal bytes `00:87:65:43:21` as its DER encoding (note the leading zero byte to ensure the serial number remains positive despite the leading 1 bit in `0x87`). The base64url encoding of those bytes is `AIdlQyE=`.
+3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE`, and the client makes the request (split onto multiple lines for readability):
 
 ~~~ text
 GET https://example.com/acme/renewal-info/
-      OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw
+      aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
 ~~~
 
 ## RenewalInfo Objects
@@ -164,7 +164,7 @@ Content-Type: application/jose+json
     "identifiers": [
       { "type": "dns", "value": "example.com" }
     ],
-    "replaces": "OM8w0VGlx1SqpUk1pFCxlOMxmaU.PqNFaGVEHxw"
+    "replaces": "aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE"
   }),
   "signature": "H6ZXtGjTZyUnPeKn...wEA4TklBdh3e454g"
 }
@@ -226,24 +226,13 @@ replaces    | string     | true         | This document
 
 ~~~ text
 -----BEGIN CERTIFICATE-----
-MIIDMDCCAhigAwIBAgIIPqNFaGVEHxwwDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UE
-AxMVbWluaWNhIHJvb3QgY2EgM2ExMzU2MB4XDTIyMDMxNzE3NTEwOVoXDTI0MDQx
-NjE3NTEwOVowFjEUMBIGA1UEAxMLZXhhbXBsZS5jb20wggEiMA0GCSqGSIb3DQEB
-AQUAA4IBDwAwggEKAoIBAQCgm9K/c+il2Pf0f8qhgxn9SKqXq88cOm9ov9AVRbPA
-OWAAewqX2yUAwI4LZBGEgzGzTATkiXfoJ3cN3k39cH6tBbb3iSPuEn7OZpIk9D+e
-3Q9/hX+N/jlWkaTB/FNA+7aE5IVWhmdczYilXa10V9r+RcvACJt0gsipBZVJ4jfJ
-HnWJJGRZzzxqG/xkQmpXxZO7nOPFc8SxYKWdfcgp+rjR2ogYhSz7BfKoVakGPbpX
-vZOuT9z4kkHra/WjwlkQhtHoTXdAxH3qC2UjMzO57Tx+otj0CxAv9O7CTJXISywB
-vEVcmTSZkHS3eZtvvIwPx7I30ITRkYk/tLl1MbyB3SiZAgMBAAGjeDB2MA4GA1Ud
-DwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDAYDVR0T
-AQH/BAIwADAfBgNVHSMEGDAWgBQ4zzDRUaXHVKqlSTWkULGU4zGZpTAWBgNVHREE
-DzANggtleGFtcGxlLmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAx0aYvmCk7JYGNEXe
-+hrOfKawkHYzWvA92cI/Oi6h+oSdHZ2UKzwFNf37cVKZ37FCrrv5pFP/xhhHvrNV
-EnOx4IaF7OrnaTu5miZiUWuvRQP7ZGmGNFYbLTEF6/dj+WqyYdVaWzxRqHFu1ptC
-TXysJCeyiGnR+KOOjOOQ9ZlO5JUK3OE4hagPLfaIpDDy6RXQt3ss0iNLuB1+IOtp
-1URpvffLZQ8xPsEgOZyPWOcabTwJrtqBwily+lwPFn2mChUx846LwQfxtsXU/lJg
-HX2RteNJx7YYNeX3Uf960mgo5an6vE8QNAsIoNHYrGyEmXDhTRe9mCHyiW2S7fZq
-o9q12g==
+MIIBQzCB66ADAgECAgUAh2VDITAKBggqhkjOPQQDAjAVMRMwEQYDVQQDEwpFeGFt
+cGxlIENBMCIYDzAwMDEwMTAxMDAwMDAwWhgPMDAwMTAxMDEwMDAwMDBaMBYxFDAS
+BgNVBAMTC2V4YW1wbGUuY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeBZu
+7cbpAYNXZLbbh8rNIzuOoqOOtmxA1v7cRm//AwyMwWxyHz4zfwmBhcSrf47NUAFf
+qzLQ2PPQxdTXREYEnKMjMCEwHwYDVR0jBBgwFoAUaYhba4dGQEHhs3uEe6CuLN4B
+yNQwCgYIKoZIzj0EAwIDRwAwRAIge09+S5TZAlw5tgtiVvuERV6cT4mfutXIlwTb
++FYN/8oCIClDsqBklhB9KAelFiYt9+6FDj3z4KGVelYM5MdsO3pK
 -----END CERTIFICATE-----
 ~~~
 
