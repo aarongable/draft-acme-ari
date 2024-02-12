@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                         8 February 2024
-Expires: 11 August 2024
+Intended status: Standards Track                        12 February 2024
+Expires: 15 August 2024
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 August 2024.
+   This Internet-Draft will expire on 15 August 2024.
 
 Copyright Notice
 
@@ -302,11 +302,11 @@ Table of Contents
    }
 
    Servers SHOULD check that the identified certificate and the current
-   New Order request correspond to the same ACME Account and share a
-   preponderance of identifiers, and that the identified certificate has
-   not already been marked as replaced by a different finalized Order.
-   Servers MAY ignore the replaces field in New Order requests which do
-   not pass such checks.
+   New Order request correspond to the same ACME Account and share
+   identifiers, and that the identified certificate has not already been
+   marked as replaced by a different finalized Order.  Servers MAY
+   ignore the replaces field in New Order requests which do not pass
+   such checks.
 
    It is suggested that Servers should use this information to grant New
    Order requests which arrive during the suggested renewal window of
