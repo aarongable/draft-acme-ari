@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                        12 February 2024
-Expires: 15 August 2024
+Intended status: Standards Track                        15 February 2024
+Expires: 18 August 2024
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 August 2024.
+   This Internet-Draft will expire on 18 August 2024.
 
 Copyright Notice
 
@@ -110,7 +110,9 @@ Table of Contents
    spike.
 
    This document specifies a mechanism by which ACME servers may provide
-   suggested renewal windows to ACME clients.
+   suggested renewal windows to ACME clients, and by which ACME clients
+   may inform ACME servers that a certificate has been renewed and
+   replaced.
 
 2.  Conventions and Definitions
 
@@ -157,10 +159,8 @@ Table of Contents
 4.1.  The "renewalInfo" Resource
 
    The "renewalInfo" resource is a new resource type introduced to ACME
-   protocol.  This new resource both allows clients to query the server
-   for suggestions on when they should renew certificates, and allows
-   clients to inform the server when they have completed renewal (or
-   otherwise replaced the certificate to their satisfaction).
+   protocol.  This new resource allows clients to query the server for
+   suggestions on when they should renew certificates.
 
    To request the suggested renewal information for a certificate, the
    client sends a GET request to a path under the server's renewalInfo
