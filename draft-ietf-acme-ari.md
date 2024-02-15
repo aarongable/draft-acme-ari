@@ -39,7 +39,7 @@ Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificat
 
 Allowing issuing CAs to suggest a period in which clients should renew their certificates enables for dynamic time-based load balancing. This allows a CA to better respond to exceptional circumstances. For example, a CA could suggest that clients renew prior to a mass-revocation event to mitigate the impact of the revocation, or a CA could suggest that clients renew earlier than they normally would to reduce the size of an upcoming mass-renewal spike.
 
-This document specifies a mechanism by which ACME servers may provide suggested renewal windows to ACME clients.
+This document specifies a mechanism by which ACME servers may provide suggested renewal windows to ACME clients, and by which ACME clients may inform ACME servers that a certificate has been renewed and replaced.
 
 # Conventions and Definitions
 
@@ -78,7 +78,7 @@ Content-Type: application/json
 
 ## The "renewalInfo" Resource
 
-The "`renewalInfo`" resource is a new resource type introduced to ACME protocol. This new resource both allows clients to query the server for suggestions on when they should renew certificates, and allows clients to inform the server when they have completed renewal (or otherwise replaced the certificate to their satisfaction).
+The "`renewalInfo`" resource is a new resource type introduced to ACME protocol. This new resource allows clients to query the server for suggestions on when they should renew certificates.
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
@@ -141,8 +141,7 @@ If the client receives no response or a malformed response (e.g. an `end` timest
 
 # Extensions to the Order Object
 
-In order to convey information regarding which certificate requests represent
-renewals of previous certificates, a new field is added to the Order object:
+In order to convey information regarding which certificate requests represent renewals of previous certificates, a new field is added to the Order object:
 
 `replaces` (string, optional): A string uniquely identifying a previously-issued certificate which this order is intended to replace. This unique identifier is constructed in the same way as the path component for GET requests described above.
 
