@@ -247,4 +247,4 @@ yNQwCgYIKoZIzj0EAwIDRwAwRAIge09+S5TZAlw5tgtiVvuERV6cT4mfutXIlwTb
 {numbered="false"}
 # Acknowledgments
 
-My thanks to Roland Shoemaker and Jacob Hoffman-Andrews for coming up with the initial idea of ARI and for helping me learn the IETF process. Thanks also to Samantha Frank, Matt Holt, Ilari Liusvaara, and Wouter Tinus for contributing client implementations. Finally, thanks to Rob Stradling, Andrew Ayer, and J.C. Jones for providing meaningful feedback and suggestions which significantly improved this specification.
+My thanks to Roland Shoemaker and Jacob Hoffman-Andrews for coming up with the initial idea of ARI and for helping me learn the IETF process. Thanks also to Samantha Frank, Matt Holt, Ilari Liusvaara, and Wouter Tinus for contributing client implementations, and to Freddy Zhang for contributing an independent server implementation. Finally, thanks to Rob Stradling, Andrew Ayer, and J.C. Jones for providing meaningful feedback and suggestions which significantly improved this specification.
