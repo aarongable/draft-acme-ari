@@ -47,6 +47,8 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Throughout this document, the word "renewal" and its variants are taken to encompass any combination of "Renewal", "Re-Key", and "Modification" as defined in [@!RFC3647].
 
+This document assumes that the certificates being issued by the ACME server are in compliance with [@!RFC5280], and in particular contain the Authority Key Identifier extension and the keyIdentifier field within that extension.
+
 # Extensions to the Directory Object
 
 An ACME server which wishes to provide renewal information **MUST** include a new field, `renewalInfo`, in its directory object.
