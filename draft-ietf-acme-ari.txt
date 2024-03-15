@@ -339,7 +339,7 @@ Table of Contents
 
    This document specifies that renewalInfo resources MUST be exposed
    and accessed via unauthenticated GET requests, a departure from
-   RFC8555’s requirement that clients must send POST-as-GET requests to
+   RFC8555's requirement that clients must send POST-as-GET requests to
    fetch resources from the server.  This is because the information
    contained in renewalInfo resources is not considered confidential,
    and because allowing renewalInfo to be easily cached is advantageous
