@@ -335,7 +335,7 @@ Table of Contents
 
    The extensions to the ACME protocol described in this document build
    upon the Security Considerations and threat model defined in
-   [RFC8555], Section Section 10.1.
+   [RFC8555], Section 10.1.
 
    This document specifies that renewalInfo resources MUST be exposed
    and accessed via unauthenticated GET requests, a departure from
