@@ -173,9 +173,14 @@ Content-Type: application/jose+json
 }
 ~~~
 
-Servers **SHOULD** check that the identified certificate and the current New Order request correspond to the same ACME Account and share identifiers, and that the identified certificate has not already been marked as replaced by a different finalized Order. Servers **MAY** ignore the `replaces` field in New Order requests which do not pass such checks.
+Servers **SHOULD** check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different pending or finalized Order. Correspondence checks beyond this (such as requiring exact identifier matching) are left up to Server policy. If any of these checks fail, the Server **SHOULD** reject the new-order request.
 
-It is suggested that Servers should use this information to grant New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such.
+If the Server accepts a new-order request with a "replaces" field, it **MUST** reflect that field in the response and in subsequent requests for the corresponding Order object.
+
+This replacement information may serve many purposes, including but not limited to:
+- granting New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such;
+- tracking the replacement of certificates which have been affected by a compliance incident, so that they can be revoked immediately after they are replaced; and
+- tying together certificates issued under the same contract with an entity identified by External Account Binding.
 
 # Security Considerations
 
