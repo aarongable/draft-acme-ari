@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                        15 February 2024
-Expires: 18 August 2024
+Intended status: Standards Track                           15 March 2024
+Expires: 16 September 2024
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 August 2024.
+   This Internet-Draft will expire on 16 September 2024.
 
 Copyright Notice
 
@@ -121,6 +121,10 @@ Table of Contents
    "OPTIONAL" in this document are to be interpreted as described in BCP
    14 [RFC2119][RFC8174] when, and only when, they appear in all
    capitals, as shown here.
+
+   Throughout this document, the word "renewal" and its variants are
+   taken to encompass any combination of "Renewal", "Re-Key", and
+   "Modification" as defined in [RFC3647].
 
 3.  Extensions to the Directory Object
 
@@ -401,6 +405,12 @@ Table of Contents
    [RFC3339]  Klyne, G. and C. Newman, "Date and Time on the Internet:
               Timestamps", RFC 3339, DOI 10.17487/RFC3339, July 2002,
               <https://www.rfc-editor.org/info/rfc3339>.
+
+   [RFC3647]  Chokhani, S., Ford, W., Sabett, R., Merrill, C., and S.
+              Wu, "Internet X.509 Public Key Infrastructure Certificate
+              Policy and Certification Practices Framework", RFC 3647,
+              DOI 10.17487/RFC3647, November 2003,
+              <https://www.rfc-editor.org/info/rfc3647>.
 
    [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
               Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
