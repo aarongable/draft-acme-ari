@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-03-19T01:01:21.194360+00:00",
+  "timestamp": "2024-03-21T01:02:36.231958+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -966,6 +966,65 @@
           "body": "> Could we rephrase this text to something like \"What to do with this information is left entirely to server policy, but here are some suggestions:\", followed by some bullet points?\r\n\r\nMakes sense to me.\r\n\r\n> It's also about cramming significantly more issuances into a narrow window that may push a CA beyond its issuance capacity, leaving some clients unable to renew in time.\r\n\r\nOnly if the server makes the ARI window narrower than it can handle. As always, it is up to the server to ensure that it can handle its traffic volume and fail gracefully -- which many servers use rate limits to accomplish today -- and the existence of ARI does nothing to change that.",
           "createdAt": "2024-03-06T20:09:54Z",
           "updatedAt": "2024-03-06T20:09:54Z"
+        }
+      ]
+    },
+    {
+      "number": 65,
+      "id": "I_kwDOGGBRNc6C-rhB",
+      "title": "Conveying renewal urgency on a per-account basis",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/65",
+      "state": "OPEN",
+      "author": "djc",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I am the CTO of Instant Labs, we host some ~1500 domains with sites for our customers. I wrote the [instant-acme](https://github.com/instant-labs/instant-acme) client for our use cases. As such, I have followed the developments around ARI with some interest. Personally I feel that making one request per certificate appears to be quite wasteful, and like @mholt in their recent email thread (https://mailarchive.ietf.org/arch/msg/acme/AeJ3zJKcBF-ZUhQXJajC0bb7orI/) I wonder if there isn't a better way to do this?\r\n\r\nI briefly discussed with Jacob HA whether it would be feasible to have a per-account endpoint that would just yield all the certificates that need updating in the next time window, but he mentioned that this would lead to highly variable response times which would be inconvenient for servers.\r\n\r\nWhich leads me to this proposal: would it be feasible to have an endpoint that just identifies the first certificate which needs renewal along with the date/time on which it should renew? This would allow clients to make a request to this endpoint and immediately go back to sleep until the given date/time.\r\n\r\n(Our current approach is storing the certificate expiry explicitly in our database alongside the certificate, we wake up a worker process every few hours to query all certificates that expire in the next 30 days and start the renewal process. Under my proposal, our worker process would check the first-renewal endpoint when it is first started, wait until the window arrives and then run again. If the window has arrived, it would do the renewal and look at the first-renewal endpoint again, etc.)",
+      "createdAt": "2024-03-20T12:55:03Z",
+      "updatedAt": "2024-03-21T00:20:40Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "I appreciate making things easier for clients.\n\nIf I understand correctly you're asking if the endpoint can simply tell the account owner when their next certificate renewal needs to be. Then after that cert is renewed, when is the next one? And so on.\n\nOne question I have is, What if the renewal date gets bumped earlier than the date from the first check?\n\n",
+          "createdAt": "2024-03-20T14:36:28Z",
+          "updatedAt": "2024-03-20T14:36:28Z"
+        },
+        {
+          "author": "djc",
+          "authorAssociation": "NONE",
+          "body": "> One question I have is, What if the renewal date gets bumped earlier than the date from the first check?\r\n\r\nFair point. I guess maybe the server would want to provide some retry-after like value that is indepent from the next certificate? This still seems like an improvement because it gives the server more control over how often clients check in. In either case, it reduces the overhead from per-outstanding certificate to per-account, which seems like an improvement.",
+          "createdAt": "2024-03-20T14:47:13Z",
+          "updatedAt": "2024-03-20T14:48:24Z"
+        },
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "There is something nice about the idea of just polling an endpoint per-account, though.\r\n\r\n**Client:** Poll. (\"Anything to renew?\")\r\n**Server:** Nope.\r\n(repeat N times...)\r\n**Client:** Poll.\r\n**Server:** Renew these certs!\r\n**Client:** _does so now_\r\n**Client:** Poll.\r\n**Server:** And now renew this one!\r\n**Client:** _does it_\r\n**Client:** Poll.\r\n**Server:** Nothing to renew right now.\r\n...\r\n\r\nIt does feel awkward to split scheduling between client and server, it feels like the server should just take charge of scheduling renewals instead of clients having to mix their own scheduling with a server's scheduling.\r\n\r\nOne problem with this could be a properly-positioned attacker -- or a network outage -- could simply drop packets or connections to the ARI server. Then again, that attacker could drop packets for the actual renewal transaction as well; so maybe not a huge concern.\r\n\r\nEither way, ARI is going to involve lots of polling.",
+          "createdAt": "2024-03-20T15:05:10Z",
+          "updatedAt": "2024-03-20T15:05:10Z"
+        },
+        {
+          "author": "djc",
+          "authorAssociation": "NONE",
+          "body": "> It does feel awkward to split scheduling between client and server, it feels like the server should just take charge of scheduling renewals instead of clients having to mix their own scheduling with a server's scheduling.\r\n\r\nSure, but in that case we don't solve the issue of the midnight thundering herd, I presume? (Potentially it alleviates the issue if the first-renewal endpoint is cheaper to execute?)",
+          "createdAt": "2024-03-20T15:07:18Z",
+          "updatedAt": "2024-03-20T15:08:14Z"
+        },
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "Well and part of me has wondered -- and I think I mentioned this in that email thread earlier -- if there'd be some benefit to making ARI part of the normal ACME order workflow. Moving \"replaces\" into the Order object in draft-03 has already started that. I could imagine doing without a separate ARI endpoint, and instead the client just starts the renewal and sets the \"replaces\" field on the Order. If the server sees the \"replaces\" field populated but the ARI logic internally says it's not time yet, the server can simply respond with a graceful Retry-After (or something) and reject the new order. In other words, setting \"replaces\" tells the server that the client is honoring ARI and is just seeing if it's time to renew; if so, please renew, if not, we'll try again later.\r\n\r\nI don't remember if I was convinced that a separate endpoint is really needed. I can't recall a reason why it can't just be wrapped up in the existing ACME flow.",
+          "createdAt": "2024-03-20T15:12:00Z",
+          "updatedAt": "2024-03-20T15:12:00Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "(This is a fascinating discussion, just noting that I'm on vacation and will reply mid-next-week.)",
+          "createdAt": "2024-03-21T00:20:39Z",
+          "updatedAt": "2024-03-21T00:20:39Z"
         }
       ]
     }
