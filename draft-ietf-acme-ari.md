@@ -45,7 +45,7 @@ This document specifies a mechanism by which ACME servers may provide suggested 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [@!RFC2119;@!RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-Throughout this document, the word "renewal" and its variants are taken to encompass any combination of "Renewal", "Re-Key", and "Modification" as defined in [@!RFC3647].
+Throughout this document, the word "renewal" and its variants are taken to encompass any combination of "Renewal", "Re-Key", and "Modification" as defined in [@RFC3647].
 
 This document assumes that the certificates being issued by the ACME server are in compliance with [@!RFC5280], and in particular contain the Authority Key Identifier extension and the keyIdentifier field within that extension.
 
