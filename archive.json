@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-03-26T01:01:16.175377+00:00",
+  "timestamp": "2024-03-28T01:01:40.955814+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -981,7 +981,7 @@
       "labels": [],
       "body": "I am the CTO of Instant Labs, we host some ~1500 domains with sites for our customers. I wrote the [instant-acme](https://github.com/instant-labs/instant-acme) client for our use cases. As such, I have followed the developments around ARI with some interest. Personally I feel that making one request per certificate appears to be quite wasteful, and like @mholt in their recent email thread (https://mailarchive.ietf.org/arch/msg/acme/AeJ3zJKcBF-ZUhQXJajC0bb7orI/) I wonder if there isn't a better way to do this?\r\n\r\nI briefly discussed with Jacob HA whether it would be feasible to have a per-account endpoint that would just yield all the certificates that need updating in the next time window, but he mentioned that this would lead to highly variable response times which would be inconvenient for servers.\r\n\r\nWhich leads me to this proposal: would it be feasible to have an endpoint that just identifies the first certificate which needs renewal along with the date/time on which it should renew? This would allow clients to make a request to this endpoint and immediately go back to sleep until the given date/time.\r\n\r\n(Our current approach is storing the certificate expiry explicitly in our database alongside the certificate, we wake up a worker process every few hours to query all certificates that expire in the next 30 days and start the renewal process. Under my proposal, our worker process would check the first-renewal endpoint when it is first started, wait until the window arrives and then run again. If the window has arrived, it would do the renewal and look at the first-renewal endpoint again, etc.)",
       "createdAt": "2024-03-20T12:55:03Z",
-      "updatedAt": "2024-03-21T00:20:40Z",
+      "updatedAt": "2024-03-27T13:40:55Z",
       "closedAt": null,
       "comments": [
         {
@@ -1025,6 +1025,20 @@
           "body": "(This is a fascinating discussion, just noting that I'm on vacation and will reply mid-next-week.)",
           "createdAt": "2024-03-21T00:20:39Z",
           "updatedAt": "2024-03-21T00:20:39Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "> Which leads me to this proposal: would it be feasible to have an endpoint that just identifies the first certificate which needs renewal along with the date/time on which it should renew? This would allow clients to make a request to this endpoint and immediately go back to sleep until the given date/time.\r\n\r\nIn my opinion, this defeats one of the purposes of ARI: that the window may shift at any time, in response to load spikes, predicted future load, revocation events, or otherwise. Simply sleeping until the indicated ARI time, without continuing to poll in the meantime, may cause clients to miss updates to the ARI suggested window.\r\n\r\nAs Matt suggested, the next obvious development from here is \"what if we polled once per account instead of once per certificate?\". I see two possible return values for this per-account polled endpoint:\r\n1. It returns the single next certificate to renew. During a mass revocation event, a client which only polls the per-account endpoint every X minutes could easily fall behind, and a client which re-polls the per-account endpoint after each replacement would end up making just as many queries as one which is polling on a per-certificate basis.\r\n2. It returns the whole collection of certificates which should be renewed right now. This results in all the same highly-variable response times, highly-variable response sizes, and paging issues as we've discussed before.\r\n\r\nAs may be obvious, I don't love either of these options.\r\n\r\n> In other words, setting \"replaces\" tells the server that the client is honoring ARI and is just seeing if it's time to renew; if so, please renew, if not, we'll try again later.\r\n\r\nThis brings no benefit. It only reduces the number of requests across the lifetime of a certificate by 1: the final \"should I renew? yes. okay here's the new order\" request pair becomes a single \"here's a new order\" which gets accepted instead of rejected. But all of the preceding requests become much heavier-weight requests containing significantly more data (and JWSes!), and all of the preceding replies become much more confusing error responses with limited data encoded in headers instead of meaningful data encoded in a dedicated JSON object.\r\n\r\nAlso, it prevents third-party monitors from ever being able to make an ARI request, which was one of the earliest design goals advocated for in early feedback.\r\n\r\n-----\r\n\r\nRight now, I still don't see a clean and reasonable way to do bulk ARI. It's just not in line with how the rest of the ACME protocol thinks about orders and certificates.",
+          "createdAt": "2024-03-26T23:23:18Z",
+          "updatedAt": "2024-03-26T23:23:18Z"
+        },
+        {
+          "author": "djc",
+          "authorAssociation": "NONE",
+          "body": "> As Matt suggested, the next obvious development from here is \"what if we polled once per account instead of once per certificate?\". I see two possible return values for this per-account polled endpoint:\r\n> \r\n> 1. It returns the single next certificate to renew. During a mass revocation event, a client which only polls the per-account endpoint every X minutes could easily fall behind, and a client which re-polls the per-account endpoint after each replacement would end up making just as many queries as one which is polling on a per-certificate basis.\r\n> \r\n> 2. It returns the whole collection of certificates which should be renewed right now. This results in all the same highly-variable response times, highly-variable response sizes, and paging issues as we've discussed before.\r\n\r\nI think I was suggesting an enumerated response, which can either have\r\n\r\n* `checkBackIn`: next window when the client should check in, or\r\n* `renewCertificate`: a certificate ID that requires renewal, and the client should check in again after renewal\r\n\r\nThis would mean that \"idle\" clients (for which there are no upcoming renewals) can be given a longer window and only have to send one request per account (instead of one request per certificate), while \"busy\" clients (for which there are upcoming renewals) will hit the endpoint once after each renewal to find the next renewal.\r\n\r\nI guess a downside might be that very busy accounts (for which there is an upcoming renewal a majority of the time) are sort of \"rate-limited\"? Not sure if that would be perceived as a good thing or a bad thing?",
+          "createdAt": "2024-03-27T13:40:39Z",
+          "updatedAt": "2024-03-27T13:40:55Z"
         }
       ]
     }
