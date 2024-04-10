@@ -173,7 +173,7 @@ Content-Type: application/jose+json
 }
 ~~~
 
-Servers **SHOULD** check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different pending or finalized Order. Correspondence checks beyond this (such as requiring exact identifier matching) are left up to Server policy. If any of these checks fail, the Server **SHOULD** reject the new-order request.
+Servers **SHOULD** check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different Order that is not "invalid". Correspondence checks beyond this (such as requiring exact identifier matching) are left up to Server policy. If any of these checks fail, the Server **SHOULD** reject the new-order request.
 
 If the Server accepts a new-order request with a "replaces" field, it **MUST** reflect that field in the response and in subsequent requests for the corresponding Order object.
 
