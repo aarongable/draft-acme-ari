@@ -178,6 +178,7 @@ Servers **SHOULD** check that the identified certificate and the New Order reque
 If the Server accepts a new-order request with a "replaces" field, it **MUST** reflect that field in the response and in subsequent requests for the corresponding Order object.
 
 This replacement information may serve many purposes, including but not limited to:
+
 - granting New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such;
 - tracking the replacement of certificates which have been affected by a compliance incident, so that they can be revoked immediately after they are replaced; and
 - tying together certificates issued under the same contract with an entity identified by External Account Binding.
