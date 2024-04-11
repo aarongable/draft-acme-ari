@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-04-09T01:02:49.854242+00:00",
+  "timestamp": "2024-04-11T01:03:12.592614+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -652,7 +652,7 @@
       "url": "https://github.com/aarongable/draft-acme-ari/issues/52",
       "state": "CLOSED",
       "author": "robstradling",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "https://www.ietf.org/archive/id/draft-ietf-acme-ari-02.html#section-4.1 refers to *\"the bytes of the certificate's Serial Number value\"*, and provides an example *\"certificate's Serial Number field\"* that is described as an *\"ASN.1 Integer value\"*.\r\n\r\nThe Summary in the ASN.1 specification ([X.680 02/2021](https://www.itu.int/rec/T-REC-X.680-202102-I/en)) says:\r\n*\"The ASN.1 notations can be applied whenever it is necessary to define the abstract syntax of information without constraining in any way how the information is encoded for transmission.\"*\r\n\r\nSince a certificate's signature is calculated over its DER encoding, I'm guessing that *\"the bytes of the certificate's\"* is intended to imply that it is the contents octets of the DER encoding of the ASN.1 INTEGER Serial Number field that should be used to produce the ARI request.  However, I think this should be stated explicitly, to avoid ambiguity.\r\n\r\nClarity on this point will be particularly important when dealing with Serial Numbers whose DER encoded contents octets begin with a 0x00 octet, which serves to indicate that the integer is non-negative. Such octets are part of the (two's complement) DER encoding of an ASN.1 INTEGER, but AIUI are not considered part of the abstract notation of an ASN.1 INTEGER.  (Consider, for [example](https://crt.sh/?id=3334561879), how `openssl x509 -text` displays serial numbers without these leading 0x00 contents octets).  If an ARI client omits the 0x00 but the ARI server is expecting the 0x00 (or vice versa), the ARI server will respond with an error.\r\n\r\nI think it would also be helpful to change the example serial number in section 4.1 to be one whose DER encoding requires a leading 0x00 contents octet.",
@@ -669,7 +669,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Thanks @aarongable.  LGTM!",
           "createdAt": "2024-02-08T20:00:25Z",
           "updatedAt": "2024-02-08T20:00:25Z"
@@ -759,7 +759,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Is indicating \"that the client should retry the renewal without the 'replaces' field\" the only use case for an HTTP 409 response?  If so, then I'm struggling to see why an HTTP 409 response would be more helpful than the -03 behaviour *\"Servers MAY ignore the `replaces` field in New Order requests which do not pass such checks\"*.\r\n\r\nIf a Server ignores the `replaces` field, then the Order object returned by the newOrder endpoint will omit the `replaces` field.  Isn't that enough of a signal to the Client that the Server has not treated the new order as a renewal?  (The -03 behaviour also avoids the Client having to retry the request, which seems preferable, all other things being equal).\r\n\r\nOr, are we envisaging that there might be reasons for a Client to choose to _not_ retry the renewal if an HTTP 409 is received?  If so, what reasons?",
           "createdAt": "2024-02-27T10:42:13Z",
           "updatedAt": "2024-02-27T10:42:13Z"
@@ -787,7 +787,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "> Rejecting the request is a clear signal to the operator (and client author) that something is amiss.\r\n\r\n@beautifulentropy Are you implying that it would be a meaningfully less clear signal for the Server to instead accept the newOrder request and omit `replaces` in the returned Order object?  If so, please could you explain your thinking on this?",
           "createdAt": "2024-02-27T21:29:35Z",
           "updatedAt": "2024-02-27T21:29:35Z"
@@ -801,7 +801,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "> The HTTP 409 Conflict response status code indicates a request conflict with the current state of the target resource.\r\n\r\nOK, I can accept that _\"has already made a new order that replaces this certificate\"_ represents a _\"request conflict with the current state of the target resource\"_.  Due to this conflict, the `replaces` field in the request cannot be accepted and included in the _\"target resource\"_ (i.e., the new Order object) by the server.\r\n\r\nBut isn't this equally true for every reason a server might have for not accepting the `replaces` field in the request?  (e.g., if the server determines that these conditions are not met: _\"the identified certificate and the current New Order request correspond to the same ACME Account and share identifiers\"_).\r\n\r\nISTM that the nondeterminism of sometimes returning 409 and sometimes ignoring the `replaces` field in the request could lead to confusion.  So if we're going the 409 route, then I think I would prefer to specify a requirement along the lines of \"If the request contains a 'replaces' value that is unacceptable to the server, then the server MUST return HTTP 409 (Conflict) with a problem document that explains the reason for rejecting it\", together with some new error types (suggested names: alreadyReplaced, wrongAccount, and identifiersNotShared).",
           "createdAt": "2024-03-01T12:36:17Z",
           "updatedAt": "2024-03-01T12:36:17Z"
@@ -815,7 +815,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "> - Some \"replaces\" fields the server will not process, due to server policy -- the identified certificate was issued to the wrong account, or with a non-overlapping set of names, or any other reason that the server determines.\r\n> - Some \"replaces\" fields the server would process, because they meet all the criteria... but it cannot, because the identified certificate has already been replaced.\r\n\r\nI disagree that a server \"cannot\" in that second scenario.  Choosing to reject a `replaces` value because the identified certificate has already been replaced is also down to server policy (_\"Servers MAY ignore the replaces field in New Order requests which do not pass such checks\"_; note that \"MAY\" does not dictate required behaviour).  But having said that...\r\n\r\n> The former can be handled with a malformed error and a 400 response code\r\n\r\nIf we're in agreement that servers MUST always return an error when rejecting a submitted `replaces` value, then I don't object to using 409 just for the \"already renewed\" case and 400 for other error conditions.  I'll let you paint the bikeshed.  ;-)",
           "createdAt": "2024-03-06T15:04:05Z",
           "updatedAt": "2024-03-06T15:04:05Z"
@@ -829,7 +829,7 @@
       "url": "https://github.com/aarongable/draft-acme-ari/issues/57",
       "state": "CLOSED",
       "author": "robstradling",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I wish I'd seen https://github.com/aarongable/draft-acme-ari/commit/8b464ffe1c5754f43a85bec7bc50ccbfafd44e64 (Remove \"a preponderance of\") yesterday, before I spent time mulling over how to interpret it!  :-)\r\n\r\nI'm not sad to see that somewhat archaic word ditched, but the wording after that commit leaves me even more unsure of what's expected.\r\n\r\nWith \"a preponderance of\", I'd concluded yesterday that >50% of the identifiers in the newOrder request must match identifiers in the certificate identified by `replaces`, or else the Server would ignore `replaces`.  (I'd also concluded that \"preponderance\" was vague enough that it would also make sense for that \">50%\" figure to be configurable, per Server, anywhere between \">50%\" and \"100%\").\r\n\r\nBut what exactly does \"share identifiers\" mean?\r\nDoes the newOrder request have to have the exact same set of identifiers as the certificate identified by `replaces`, with zero identifiers dropped and zero identifiers added?  (If so, then I'd suggest tightening the wording to \"share the exact same set of identifiers\" or something similar).\r\nOr is it intended that defining the meaning of \"share identifiers\" should be left to each individual Server's policy?  (If so, then I'd suggest adding to wording to explicitly say this).",
@@ -846,7 +846,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "I agree that leaving it up to server policy makes sense, given that what a server should do with an accepted `replaces` value is also left up to server policy.",
           "createdAt": "2024-03-06T14:49:05Z",
           "updatedAt": "2024-03-06T14:49:05Z"
@@ -860,7 +860,7 @@
       "url": "https://github.com/aarongable/draft-acme-ari/issues/58",
       "state": "CLOSED",
       "author": "robstradling",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "When draft-acme-ari says \"renewal\" or \"renew\", I'm guessing the intended meaning is any combination of (in RFC3647 terms) Renewal and/or Re-Key and/or Modification:\r\n\r\nhttps://www.rfc-editor.org/rfc/rfc3647.html#section-4.4.6 (Certificate Renewal)\r\n>   Certificate renewal means the issuance of a\r\n>   new certificate to the subscriber without changing the subscriber or\r\n>   other participant's public key or any other information in the\r\n>   certificate:\r\n\r\nhttps://www.rfc-editor.org/rfc/rfc3647.html#section-4.4.7 (Certificate Re-Key)\r\n>   ...generating a new key pair and\r\n>   applying for the issuance of a new certificate that certifies the new\r\n>   public key:\r\n\r\nhttps://www.rfc-editor.org/rfc/rfc3647.html#section-4.4.8 (Certificate Modification)\r\n>   ...the issuance of a new certificate (6) due to changes in the\r\n>   information in the certificate other than the subscriber public key\r\n\r\nAssuming I've guessed correctly, and in the interest of avoiding confusion amongst implementors, observers, and auditors...\r\nShould draft-acme-ari be revised so that its terminology is aligned with RFC3647's terminology?\r\nOr would it be enough to add a single sentence to draft-acme-ari along the lines of \"In this document, 'renewal' is taken to encompass any combination of Renewal, Re-Key, and Modification [RFC3647]\" ?\r\n\r\nRelatedly, I think it's good that the new field in the Order object is named `replaces` rather than `renews`, since (unlike \"Certificate Renewal\"), \"Certificate Replacement\" is not an RFC3647 term with a different scope.",
@@ -907,7 +907,7 @@
       "url": "https://github.com/aarongable/draft-acme-ari/issues/60",
       "state": "CLOSED",
       "author": "robstradling",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "In #57 we seem to be in agreement that it should be left to server policy to decide whether or not the identifier list in a New Order request and its claimed predecessor certificate _\"share identifiers\"_.  Similarly, the current language that affects client behaviour (_\"Clients SHOULD include this field in New Order requests if there is a clear predecessor certificate\"_) implies that it's left to client policy when a client is deciding if/how to populate the `replaces` field in a New Order request.\r\n\r\nConsider this scenario: A client has a soon-to-expire certificate (X) that has SAN:dNSName entries for a.com and b.com.  Instead of getting a like-for-like replacement, the client wishes to \"renew\" that certificate by ordering two new single-domain certificates - one cert for a.com, and another cert for b.com.  That client's policy is (quoting one of the suggested example policies in #57) \"The replacement must share at least one identifier (as long as any name is being renewed, it counts)\".  For both New Order requests, the client indicates certificate X in the `replaces` field, because it considers X to be the _\"clear predecessor certificate\"_ in both cases.\r\n\r\nGiven that _\"Servers SHOULD check...that the identified certificate has not already been marked as replaced by a different finalized Order\"_, ISTM that it would be worth providing more advice to clients regarding how to determine what is or isn't a _\"clear predecessor certificate\"_.\r\n\r\nSince _\"Servers MAY ignore the replaces field in New Order requests which do not pass such checks\"_ implies that servers are free to choose to regard multiple New Order requests as renewals of the same predecessor certificate, ISTM that the advice to clients should be: Be aware that some servers may reject a `replaces` value that has already been specified in a previous New Order request.\r\n\r\nI realise this is closely related to #56, although that issue is about server behaviour.",
@@ -924,7 +924,7 @@
         },
         {
           "author": "robstradling",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "I now understand your intended meaning, but I disagree that my interpretation is unsupported by the current text.  +1 on returning to this later though.",
           "createdAt": "2024-03-07T17:29:38Z",
           "updatedAt": "2024-03-07T17:29:38Z"
@@ -945,7 +945,7 @@
       "url": "https://github.com/aarongable/draft-acme-ari/issues/61",
       "state": "CLOSED",
       "author": "robstradling",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Current text:\r\n> It is suggested that Servers should use this information to grant New Order requests which arrive during the suggested renewal window of their identified predecessor certificate higher priority or allow them to bypass rate limits, if the Server's policy uses such.\r\n\r\nI realise this is a not-upper-case \"should\" and it's prefixed by \"It is suggested\", but TBH I'd characterise this language as being slightly more prescriptive than something like \"What to do with this information is left entirely to server policy, but here are some suggestions:\".  Is that the intent?\r\n\r\nAlso, ISTM that the \"...should...higher priority...bypass rate limits\" language is geared towards high volume issuers, which not all server operators are.  Indeed, a server might not have any mechanisms for assigning higher priority or for bypassing rate limits, but might want to \"use this information\" in other ways.  For example, some CAs tend to extend the lifetime of a renewed certificate by the amount of time left on the predecessor certificate, which makes sense in cases where there is monetary value associated with the renewal.\r\n\r\nCould we rephrase this text to something like \"What to do with this information is left entirely to server policy, but here are some suggestions:\", followed by some bullet points?",
@@ -1039,6 +1039,30 @@
           "body": "> As Matt suggested, the next obvious development from here is \"what if we polled once per account instead of once per certificate?\". I see two possible return values for this per-account polled endpoint:\r\n> \r\n> 1. It returns the single next certificate to renew. During a mass revocation event, a client which only polls the per-account endpoint every X minutes could easily fall behind, and a client which re-polls the per-account endpoint after each replacement would end up making just as many queries as one which is polling on a per-certificate basis.\r\n> \r\n> 2. It returns the whole collection of certificates which should be renewed right now. This results in all the same highly-variable response times, highly-variable response sizes, and paging issues as we've discussed before.\r\n\r\nI think I was suggesting an enumerated response, which can either have\r\n\r\n* `checkBackIn`: next window when the client should check in, or\r\n* `renewCertificate`: a certificate ID that requires renewal, and the client should check in again after renewal\r\n\r\nThis would mean that \"idle\" clients (for which there are no upcoming renewals) can be given a longer window and only have to send one request per account (instead of one request per certificate), while \"busy\" clients (for which there are upcoming renewals) will hit the endpoint once after each renewal to find the next renewal.\r\n\r\nI guess a downside might be that very busy accounts (for which there is an upcoming renewal a majority of the time) are sort of \"rate-limited\"? Not sure if that would be perceived as a good thing or a bad thing?",
           "createdAt": "2024-03-27T13:40:39Z",
           "updatedAt": "2024-03-27T13:40:55Z"
+        }
+      ]
+    },
+    {
+      "number": 66,
+      "id": "I_kwDOGGBRNc6FOgrn",
+      "title": "Criteria for \"has not already been marked as replaced\"",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/66",
+      "state": "OPEN",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 5 currently says (emphasis mine):\r\n\r\n> Servers SHOULD check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different **pending or finalized** Order.\r\n\r\n\"pending\" is an [Order object status](https://datatracker.ietf.org/doc/html/rfc8555#section-7.1.3), but \"finalized\" is not.\r\n\r\nThere are a couple of problems with this language AIUI:\r\n- \"pending or finalized\" does not include the \"ready\" Order object state.\r\n- \"pending or finalized\" does include the subset of \"invalid\" Order objects that transitioned from \"processing\" to \"invalid\".\r\n\r\nHere are a couple of wordsmithing attempts for your consideration:\r\n\r\n1. ...by a different \"pending\", \"ready\", \"processing\", or \"valid\" Order.\r\n2. ...by a different Order that is not \"invalid\".",
+      "createdAt": "2024-04-10T09:44:01Z",
+      "updatedAt": "2024-04-10T22:03:08Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Thank you! This is a very good catch. I prefer your second proposal here, \"...by a different Order that is not \"invalid\".\"",
+          "createdAt": "2024-04-10T22:03:07Z",
+          "updatedAt": "2024-04-10T22:03:07Z"
         }
       ]
     }
@@ -2797,6 +2821,74 @@
       "mergeCommit": {
         "oid": "4e270f35a677f90db3ee4b11357150b0672cad1d"
       },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 67,
+      "id": "PR_kwDOGGBRNc5sOdUZ",
+      "title": "Need empty line before bullet list items.",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/67",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-04-10T10:03:05Z",
+      "updatedAt": "2024-04-10T21:59:27Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "4b41d813ee77ce87851745b37002dad6f1068594",
+      "headRepository": "robstradling/draft-acme-ari",
+      "headRefName": "fix_bulleted_list",
+      "headRefOid": "eea19dedc6dcdcd5097311aa2ecfe5a19b689773",
+      "closedAt": "2024-04-10T21:59:27Z",
+      "mergedAt": "2024-04-10T21:59:27Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "4f023a370e4bda51852b2780d22f7d80b96783fe"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc52xvg4",
+          "commit": {
+            "abbreviatedOid": "eea19de"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-04-10T21:59:18Z",
+          "updatedAt": "2024-04-10T21:59:18Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 68,
+      "id": "PR_kwDOGGBRNc5sS5EC",
+      "title": "Remove \"finalized\" as an Order state",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/68",
+      "state": "OPEN",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes https://github.com/aarongable/draft-acme-ari/issues/66",
+      "createdAt": "2024-04-10T22:02:51Z",
+      "updatedAt": "2024-04-10T22:03:04Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "4f023a370e4bda51852b2780d22f7d80b96783fe",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "not-finalized",
+      "headRefOid": "2970366ed8ff2baf223ebe26592af09cff8d7a8c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
       "comments": [],
       "reviews": []
     }
