@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-04-11T01:03:12.592614+00:00",
+  "timestamp": "2024-04-14T01:27:12.100663+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1047,15 +1047,15 @@
       "id": "I_kwDOGGBRNc6FOgrn",
       "title": "Criteria for \"has not already been marked as replaced\"",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/66",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "robstradling",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Section 5 currently says (emphasis mine):\r\n\r\n> Servers SHOULD check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different **pending or finalized** Order.\r\n\r\n\"pending\" is an [Order object status](https://datatracker.ietf.org/doc/html/rfc8555#section-7.1.3), but \"finalized\" is not.\r\n\r\nThere are a couple of problems with this language AIUI:\r\n- \"pending or finalized\" does not include the \"ready\" Order object state.\r\n- \"pending or finalized\" does include the subset of \"invalid\" Order objects that transitioned from \"processing\" to \"invalid\".\r\n\r\nHere are a couple of wordsmithing attempts for your consideration:\r\n\r\n1. ...by a different \"pending\", \"ready\", \"processing\", or \"valid\" Order.\r\n2. ...by a different Order that is not \"invalid\".",
       "createdAt": "2024-04-10T09:44:01Z",
-      "updatedAt": "2024-04-10T22:03:08Z",
-      "closedAt": null,
+      "updatedAt": "2024-04-11T15:01:28Z",
+      "closedAt": "2024-04-11T15:01:28Z",
       "comments": [
         {
           "author": "aarongable",
@@ -1063,6 +1063,13 @@
           "body": "Thank you! This is a very good catch. I prefer your second proposal here, \"...by a different Order that is not \"invalid\".\"",
           "createdAt": "2024-04-10T22:03:07Z",
           "updatedAt": "2024-04-10T22:03:07Z"
+        },
+        {
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Thanks @aarongable !",
+          "createdAt": "2024-04-11T10:26:01Z",
+          "updatedAt": "2024-04-11T10:26:01Z"
         }
       ]
     }
@@ -2871,25 +2878,35 @@
       "id": "PR_kwDOGGBRNc5sS5EC",
       "title": "Remove \"finalized\" as an Order state",
       "url": "https://github.com/aarongable/draft-acme-ari/pull/68",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "aarongable",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Fixes https://github.com/aarongable/draft-acme-ari/issues/66",
       "createdAt": "2024-04-10T22:02:51Z",
-      "updatedAt": "2024-04-10T22:03:04Z",
+      "updatedAt": "2024-04-11T15:01:28Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "4f023a370e4bda51852b2780d22f7d80b96783fe",
       "headRepository": "aarongable/draft-acme-ari",
       "headRefName": "not-finalized",
       "headRefOid": "2970366ed8ff2baf223ebe26592af09cff8d7a8c",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2024-04-11T15:01:27Z",
+      "mergedAt": "2024-04-11T15:01:27Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "98cf320e72f3f5163f63c956ec26ed4c1ce59de0"
+      },
+      "comments": [
+        {
+          "author": "robstradling",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "LGTM!",
+          "createdAt": "2024-04-11T10:26:19Z",
+          "updatedAt": "2024-04-11T10:26:19Z"
+        }
+      ],
       "reviews": []
     }
   ]
