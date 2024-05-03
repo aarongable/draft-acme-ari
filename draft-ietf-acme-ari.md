@@ -131,11 +131,12 @@ The server **SHOULD** include a `Retry-After` header indicating the polling inte
 
 Conforming clients **MUST** attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is **RECOMMENDED** for choosing a renewal time:
 
-  1. Select a uniform random time within the suggested window.
-  2. If the selected time is in the past, attempt renewal immediately.
-  3. Otherwise, if the client can schedule itself to attempt renewal at exactly the selected time, do so.
-  4. Otherwise, if the selected time is before the next time that the client would wake up normally, attempt renewal immediately.
-  5. Otherwise, sleep until the next normal wake time, re-check ARI, and return to Step 1.
+  1. Query the `renewalInfo` resource to get a suggested renewal window.
+  2. Select a uniform random time within the suggested window.
+  3. If the selected time is in the past, attempt renewal immediately.
+  4. Otherwise, if the client can schedule itself to attempt renewal at exactly the selected time, do so.
+  5. Otherwise, if the selected time is before the next time that the client would wake up normally, attempt renewal immediately.
+  6. Otherwise, sleep until the `Retry-After` period has passed, or until the next normal wake time, and return to Step 1.
 
 In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.
 
