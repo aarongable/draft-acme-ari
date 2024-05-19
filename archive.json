@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-05-16T01:06:04.790568+00:00",
+  "timestamp": "2024-05-19T01:10:33.470757+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -623,7 +623,7 @@
       "labels": [],
       "body": "Consider a subsection under the \"Getting Renewal Information\" titled \"Immediate Renewal Scenarios\".  \r\n\r\nIt should explain some situations in which a \"renew now\" payload is sent, and a security audit or server configuration audit may be necessary.\r\n\r\nPossible text:\r\n\r\n```\r\n## Immediate Renewal Scenarios\r\n\r\nIf the `end` of the `suggestedWindow` is in the past, clients **SHOULD** attempt renewal immediately.\r\n\r\nInstances like this **SHOULD** be logged and investigated.  If the ARI payload contains an `explanationUrl`, it should be logged and reviewed.\r\n\r\nThere are three main scenarios that will cause a Certificate to require immediate renewal:\r\n\r\n* The Certificate has been revoked through the ACME API.  This is often due to an intended action of the Certificate's owner, but this can be due to the result of a malicious actor who obtains the credentials necessary for revocation.  \r\n* The Certificate has been revoked by the Certificate Authority in a mass revocation event.  This could be due to a minor violation of the CA/B Baseline Requirements or a significant security concern.\r\n* The client has failed to refresh ARI information on the recommended basis. This could be due to the client or a scheduler being incorrectly configured.\r\n\r\nThe above list is not exhaustive; other scenarios can require immediate renewal.  It is recommended that all immediate renewal situations are logged and audited.  In situations where there is a security concern, such as an unintended revocation, subscribers should ensure the revocation was an unintended consequence of their actions and not due to a security compromise.  Subscribers may decide to inspect Certificate Transparent Logs for the affected domains.  In situations where there may be a misconfiguration of the client or a scheduler, subscribers should audit their integrations to ensure future Certificates are renewed in a timely manner.\r\n```\r\n",
       "createdAt": "2023-06-29T23:38:00Z",
-      "updatedAt": "2024-05-03T15:21:55Z",
+      "updatedAt": "2024-05-16T21:09:22Z",
       "closedAt": null,
       "comments": [
         {
@@ -639,6 +639,27 @@
           "body": "No change to the algorithm is suggested by this.  That line could be updated to whatever the current \"Immediate Renewal\" (IR) language is.\r\n\r\nThe purpose of this Issue is to recommend the logging and investigation of all detected IRs \u2013 and explain that in most situations, an IR (as indicated by a past expiration time in the payload) is almost certainly because of a server misconfiguration or CA revocation.\r\n\r\nAFAIK, the only times a Subscriber should expect an IR are:\r\n* They revoked that certificate themselves\r\n* They have just onboarded ARI functionality for the first time\r\n\r\nUnless you're expecting an IR payload for those reasons, detecting one generally means that something, somewhere, has broken \u2013 so Clients should log and alert Subscribers to investigate.\r\n\r\nIMHO, aside from those two situations, the most likely causes of an IR are going to be (in descending order):\r\n\r\n* Server misconfiguration - ARI checks are not happening as they should.  \r\n* Mass revocation event - this may impact connectivity for end-users and other systems\r\n* A malicious actor has revoked their certificate\r\n\r\n\r\n\r\n\r\n\r\n",
           "createdAt": "2024-05-03T15:21:54Z",
           "updatedAt": "2024-05-03T15:21:54Z"
+        },
+        {
+          "author": "petercooperjr",
+          "authorAssociation": "NONE",
+          "body": "I don't know if you might just call this \"Server misconfiguration\", but it might be good to consider cases where the server isn't up 24/7. For home appliance-type servers (like a network-attached storage device or whatnot), if I have it turned off for a week when I go on vacation, and then when I turn it back on it turns out that it missed its ARI window and needs to renew immediately, that really isn't a \"critical failure that needs to be investigated now\" scenario.\r\n\r\nI think the real indicator of something wonky requiring investigation might just be whether that explanationUrl is present. But there isn't much guidance to CAs on when to populate it, so I could imagine one CA always populating it with a link to their regular documentation about preferred renewal timelines, and another CA only populating it when initiated by a compliance incident. It might be worth having it be a \"SHOULD\" or \"RECOMMENDED\" or the like for that explanationUrl field to be populated if the certificate was revoked (or is about to be revoked), and maybe guidance that it shouldn't be populated for \"normal\" time windows.",
+          "createdAt": "2024-05-16T20:27:23Z",
+          "updatedAt": "2024-05-16T20:27:23Z"
+        },
+        {
+          "author": "jvanasco",
+          "authorAssociation": "NONE",
+          "body": "A server with periodic connectivity is a specific case with a minority of users, and obviously/inherently not a misconfiguration.  We can easily generate a long list of other specific usages and edge cases that will affect 2%-20% of users - that should not prevent advising the majority of Subscribers that a missed ARI window is likely something that should be quickly looked at.",
+          "createdAt": "2024-05-16T21:05:14Z",
+          "updatedAt": "2024-05-16T21:05:14Z"
+        },
+        {
+          "author": "petercooperjr",
+          "authorAssociation": "NONE",
+          "body": "Sure; not really objecting. I'm just not sure how much of this \"implementation guidance\" should be in the RFC, vs. some other place. (And I mean that \"not sure\" sincerely, this may be the best place for it.) And all I was trying to do is to ensure that the server with intermittent connectivity was thought of somewhere in the process, I know it's not the common use case.",
+          "createdAt": "2024-05-16T21:09:21Z",
+          "updatedAt": "2024-05-16T21:09:21Z"
         }
       ]
     },
@@ -2951,7 +2972,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-04-10T10:03:05Z",
-      "updatedAt": "2024-04-10T21:59:27Z",
+      "updatedAt": "2024-05-17T00:18:07Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "4b41d813ee77ce87851745b37002dad6f1068594",
