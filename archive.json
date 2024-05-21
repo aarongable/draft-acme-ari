@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-05-19T01:10:33.470757+00:00",
+  "timestamp": "2024-05-21T01:06:02.222061+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -623,7 +623,7 @@
       "labels": [],
       "body": "Consider a subsection under the \"Getting Renewal Information\" titled \"Immediate Renewal Scenarios\".  \r\n\r\nIt should explain some situations in which a \"renew now\" payload is sent, and a security audit or server configuration audit may be necessary.\r\n\r\nPossible text:\r\n\r\n```\r\n## Immediate Renewal Scenarios\r\n\r\nIf the `end` of the `suggestedWindow` is in the past, clients **SHOULD** attempt renewal immediately.\r\n\r\nInstances like this **SHOULD** be logged and investigated.  If the ARI payload contains an `explanationUrl`, it should be logged and reviewed.\r\n\r\nThere are three main scenarios that will cause a Certificate to require immediate renewal:\r\n\r\n* The Certificate has been revoked through the ACME API.  This is often due to an intended action of the Certificate's owner, but this can be due to the result of a malicious actor who obtains the credentials necessary for revocation.  \r\n* The Certificate has been revoked by the Certificate Authority in a mass revocation event.  This could be due to a minor violation of the CA/B Baseline Requirements or a significant security concern.\r\n* The client has failed to refresh ARI information on the recommended basis. This could be due to the client or a scheduler being incorrectly configured.\r\n\r\nThe above list is not exhaustive; other scenarios can require immediate renewal.  It is recommended that all immediate renewal situations are logged and audited.  In situations where there is a security concern, such as an unintended revocation, subscribers should ensure the revocation was an unintended consequence of their actions and not due to a security compromise.  Subscribers may decide to inspect Certificate Transparent Logs for the affected domains.  In situations where there may be a misconfiguration of the client or a scheduler, subscribers should audit their integrations to ensure future Certificates are renewed in a timely manner.\r\n```\r\n",
       "createdAt": "2023-06-29T23:38:00Z",
-      "updatedAt": "2024-05-16T21:09:22Z",
+      "updatedAt": "2024-05-20T23:35:26Z",
       "closedAt": null,
       "comments": [
         {
@@ -660,6 +660,27 @@
           "body": "Sure; not really objecting. I'm just not sure how much of this \"implementation guidance\" should be in the RFC, vs. some other place. (And I mean that \"not sure\" sincerely, this may be the best place for it.) And all I was trying to do is to ensure that the server with intermittent connectivity was thought of somewhere in the process, I know it's not the common use case.",
           "createdAt": "2024-05-16T21:09:21Z",
           "updatedAt": "2024-05-16T21:09:21Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "I think this is largely why I'm not in favor of adding language to this effect. There are many reasons for \"immediate renewal\" scenarios:\r\n- your cert has been or is about to be revoked\r\n- the CA has shifted your renewal window for load balancing purposes\r\n- the CA has randomly jittered your renewal window for agility purposes\r\n- your server was offline for an extended period\r\n- absolutely nothing is wrong, the randomly-selected time within the renewal window just happens to have fallen a few seconds ago\r\n\r\n\r\nAlso:\r\n\r\n> I could imagine one CA always populating [the explanationURL] with a link to their regular documentation about preferred renewal timelines\r\n\r\nLet's Encrypt plans to do exactly this, so I'm not a fan of saying CAs should avoid populating it",
+          "createdAt": "2024-05-20T23:19:58Z",
+          "updatedAt": "2024-05-20T23:19:58Z"
+        },
+        {
+          "author": "petercooperjr",
+          "authorAssociation": "NONE",
+          "body": "Yeah, I think the thing that needs to be logged and investigated is if the certificate wasn't renewed before some percentage of its lifetime. Even if it renews really early because of some CA incident, there really isn't anything for the server owner to do in that case; everything went exactly as it should.\r\n\r\nWe regards to explanationURL, I guess I'm just not sure exactly what the client or administrator should really *do* with that information. I guess it could be helpful to be logged just in case the administrator is curious about why a certificate was renewed early, but again if the renewal is successful then I don't think there's any action they should really be taking. The scenario that might be more meaningful is when the suggested window is in the past *and renewal fails*, and in that case the administrator needs to be alerted because it may indicate a future problem (CA planned downtime or incident requiring revoking or whatnot) that they need to figure out how to work around (by ensuring that their system answering challenges is up, switching CAs, or whatever), and the explanationURL might help them understand the impact.",
+          "createdAt": "2024-05-20T23:29:28Z",
+          "updatedAt": "2024-05-20T23:29:28Z"
+        },
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "> Yeah, I think the thing that needs to be logged and investigated is if the certificate wasn't renewed before some percentage of its lifetime.\r\n\r\nWe do this in Caddy/CertMagic... if it's the last 1/20th or 1/50th of its lifetime (there's two code paths - one for ARI, one without) we emit a slightly louder log saying that we're renewing now (in the ARI code path, we specifically mention that we're ignoring ARI at that point).\r\n\r\n> We regards to explanationURL, I guess I'm just not sure exactly what the client or administrator should really do with that information. I guess it could be helpful to be logged just in case the administrator is curious about why a certificate was renewed early, but again if the renewal is successful then I don't think there's any action they should really be taking. The scenario that might be more meaningful is when the suggested window is in the past and renewal fails, and in that case the administrator needs to be alerted because it may indicate a future problem (CA planned downtime or incident requiring revoking or whatnot) that they need to figure out how to work around (by ensuring that their system answering challenges is up, switching CAs, or whatever), and the explanationURL might help them understand the impact.\r\n\r\nYeah, we are just logging the explanationURL, and if there's a failure, you can go into the same logs that report the error, and find the explanationURL. :man_shrugging: ",
+          "createdAt": "2024-05-20T23:35:25Z",
+          "updatedAt": "2024-05-20T23:35:25Z"
         }
       ]
     },
@@ -1135,7 +1156,7 @@
       "labels": [],
       "body": "Section 4.2 says:\r\n\r\n> The server SHOULD include a Retry-After header indicating the polling interval that the ACME server recommends. Conforming clients SHOULD query the renewalInfo URL again after the Retry-After period has passed, as the server may provide a different suggestedWindow.\r\n\r\nBecause of SHOULD instead of MUST, what should clients do for poll timing if the Retry-After header is omitted?\r\n\r\nThe only potentially relevant advice I can find is at the end of the section:\r\n\r\n> If the client receives no response or a malformed response (e.g. an end timestamp which is equal to or precedes the start timestamp), it SHOULD make its own determination of when to renew the certificate, and MAY retry the renewalInfo request with appropriate exponential backoff behavior.\r\n\r\nBut this seems to be related more to error handling and not a successful response without a Retry-After header. If we were to do exponential backoff as the norm (i.e. with successful responses), we'd likely end up hammering the endpoint at first and then potentially missing the window later!\r\n\r\nShould we poll every... hour? Day? 2 hours? 10 minutes? I guess I'm looking for what to do in practice here. Thanks",
       "createdAt": "2024-05-03T14:29:33Z",
-      "updatedAt": "2024-05-03T20:18:43Z",
+      "updatedAt": "2024-05-20T23:22:00Z",
       "closedAt": null,
       "comments": [
         {
@@ -1144,6 +1165,13 @@
           "body": "Thinking on this more, I wonder if a default poll interval of some ratio until the start of the suggestedWindow would make sense, since in general, we have no idea what timescales we'll be operating on.\r\n\r\nIf the system wakes every minute, you don't want to poll every time if the remaining certificate lifetime is on the order of weeks or months.\r\n\r\nIf the certificate lifetime is on the order of hours, you probably want to poll more often.",
           "createdAt": "2024-05-03T20:18:42Z",
           "updatedAt": "2024-05-03T20:18:42Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "I don't think this level of detail is worth specifying at the protocol level. Clients have been implementing polling, and servers have been implementing rate-limiting, since time immemorial. There are many good ways to do it, and many bad ways to do it, and I don't think it is within the purview of this small document to try to solve them.",
+          "createdAt": "2024-05-20T23:21:59Z",
+          "updatedAt": "2024-05-20T23:21:59Z"
         }
       ]
     },
