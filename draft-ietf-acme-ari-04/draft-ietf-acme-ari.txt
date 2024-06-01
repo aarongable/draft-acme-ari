@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                           10 April 2024
-Expires: 12 October 2024
+Intended status: Standards Track                             1 June 2024
+Expires: 3 December 2024
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -32,11 +32,22 @@ Current Implementations
    Staging (https://acme-staging-v02.api.letsencrypt.org/directory)
    environments.  Google Trust Services has done the same
    (https://security.googleblog.com/2023/05/google-trust-services-acme-
-   api_0503894189.html).  Client implementations include Lego
-   (https://github.com/go-acme/lego), eggsampler
-   (https://github.com/eggsampler/acme), ACMEz
-   (https://github.com/mholt/acmez), and win-acme (https://github.com/
-   win-acme/win-acme).
+   api_0503894189.html).  The Pebble (https://github.com/letsencrypt/
+   pebble) ACME server intended for testing client ACME implementations
+   also supports ARI.
+
+   Client implementations include Lego (https://github.com/go-acme/
+   lego), eggsampler (https://github.com/eggsampler/acme), Caddy
+   (https://github.com/caddyserver/caddy/releases/tag/v2.8.0), CertMagic
+   (https://github.com/caddyserver/certmagic/pull/286), ACMEz
+   (https://github.com/mholt/acmez/blob/master/acme/ari.go), win-acme
+   (https://github.com/win-acme/win-acme), Tailscale
+   (https://letsencrypt.org/2024/05/01/ari-in-tailscale), Ceritfy the
+   Web (https://github.com/webprofusion/certify), acme4j
+   (https://github.com/shred/acme4j/
+   commit/48c32f612d1f87203e4a10d8fa7d36a924bca31b), and Ansible's
+   community.crypto (https://github.com/ansible-collections/
+   community.crypto/).
 
 Status of This Memo
 
@@ -53,7 +64,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 October 2024.
+   This Internet-Draft will expire on 3 December 2024.
 
 Copyright Notice
 
@@ -250,14 +261,15 @@ Table of Contents
    based on the suggested renewal window.  The following algorithm is
    RECOMMENDED for choosing a renewal time:
 
-   1.  Select a uniform random time within the suggested window.
-   2.  If the selected time is in the past, attempt renewal immediately.
-   3.  Otherwise, if the client can schedule itself to attempt renewal
+   1.  Query the renewalInfo resource to get a suggested renewal window.
+   2.  Select a uniform random time within the suggested window.
+   3.  If the selected time is in the past, attempt renewal immediately.
+   4.  Otherwise, if the client can schedule itself to attempt renewal
        at exactly the selected time, do so.
-   4.  Otherwise, if the selected time is before the next time that the
+   5.  Otherwise, if the selected time is before the next time that the
        client would wake up normally, attempt renewal immediately.
-   5.  Otherwise, sleep until the next normal wake time, re-check ARI,
-       and return to Step 1.
+   6.  Otherwise, sleep until the Retry-After period has passed, or
+       until the next normal wake time, and return to Step 1.
 
    In all cases, renewal attempts are subject to the client's existing
    error backoff and retry intervals.
@@ -470,12 +482,12 @@ Acknowledgments
 
    My thanks to Roland Shoemaker and Jacob Hoffman-Andrews for coming up
    with the initial idea of ARI and for helping me learn the IETF
-   process.  Thanks also to Samantha Frank, Matt Holt, Ilari Liusvaara,
-   and Wouter Tinus for contributing client implementations, and to
-   Freddy Zhang for contributing an independent server implementation.
-   Finally, thanks to Rob Stradling, Andrew Ayer, and J.C.  Jones for
-   providing meaningful feedback and suggestions which significantly
-   improved this specification.
+   process.  Thanks also to Samantha Frank, Phil Porada, Matt Holt,
+   Ilari Liusvaara, and Wouter Tinus for contributing client
+   implementations, and to Freddy Zhang for contributing an independent
+   server implementation.  Finally, thanks to Rob Stradling, Andrew
+   Ayer, and J.C.  Jones for providing meaningful feedback and
+   suggestions which significantly improved this specification.
 
 Author's Address
 
