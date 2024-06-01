@@ -29,7 +29,9 @@ This document specifies how an ACME server may provide suggestions to ACME clien
 
 Draft note: this section will be removed by the editor before final publication.
 
-Let's Encrypt's [Boulder](https://github.com/letsencrypt/boulder) software fully implements the server side of an earlier version of this draft, and that implementation is deployed in both the [Production](https://acme-v02.api.letsencrypt.org/directory) and [Staging](https://acme-staging-v02.api.letsencrypt.org/directory) environments. Google Trust Services has [done the same](https://security.googleblog.com/2023/05/google-trust-services-acme-api_0503894189.html). Client implementations include [Lego](https://github.com/go-acme/lego), [eggsampler](https://github.com/eggsampler/acme), [ACMEz](https://github.com/mholt/acmez), and [win-acme](https://github.com/win-acme/win-acme).
+Let's Encrypt's [Boulder](https://github.com/letsencrypt/boulder) software fully implements the server side of an earlier version of this draft, and that implementation is deployed in both the [Production](https://acme-v02.api.letsencrypt.org/directory) and [Staging](https://acme-staging-v02.api.letsencrypt.org/directory) environments. Google Trust Services has [done the same](https://security.googleblog.com/2023/05/google-trust-services-acme-api_0503894189.html). The [Pebble](https://github.com/letsencrypt/pebble) ACME server intended for testing client ACME implementations also supports ARI.
+
+Client implementations include [Lego](https://github.com/go-acme/lego), [eggsampler](https://github.com/eggsampler/acme), [Caddy](https://github.com/caddyserver/caddy/releases/tag/v2.8.0), [CertMagic](https://github.com/caddyserver/certmagic/pull/286), [ACMEz](https://github.com/mholt/acmez/blob/master/acme/ari.go), [win-acme](https://github.com/win-acme/win-acme), [Tailscale](https://letsencrypt.org/2024/05/01/ari-in-tailscale), [Ceritfy the Web](https://github.com/webprofusion/certify), [acme4j](https://github.com/shred/acme4j/commit/48c32f612d1f87203e4a10d8fa7d36a924bca31b), and [Ansible's community.crypto](https://github.com/ansible-collections/community.crypto/).
 
 {mainmatter}
 
@@ -249,4 +251,4 @@ yNQwCgYIKoZIzj0EAwIDRwAwRAIge09+S5TZAlw5tgtiVvuERV6cT4mfutXIlwTb
 {numbered="false"}
 # Acknowledgments
 
-My thanks to Roland Shoemaker and Jacob Hoffman-Andrews for coming up with the initial idea of ARI and for helping me learn the IETF process. Thanks also to Samantha Frank, Matt Holt, Ilari Liusvaara, and Wouter Tinus for contributing client implementations, and to Freddy Zhang for contributing an independent server implementation. Finally, thanks to Rob Stradling, Andrew Ayer, and J.C. Jones for providing meaningful feedback and suggestions which significantly improved this specification.
+My thanks to Roland Shoemaker and Jacob Hoffman-Andrews for coming up with the initial idea of ARI and for helping me learn the IETF process. Thanks also to Samantha Frank, Phil Porada, Matt Holt, Ilari Liusvaara, and Wouter Tinus for contributing client implementations, and to Freddy Zhang for contributing an independent server implementation. Finally, thanks to Rob Stradling, Andrew Ayer, and J.C. Jones for providing meaningful feedback and suggestions which significantly improved this specification.
