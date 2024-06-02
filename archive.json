@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-05-30T01:07:28.702782+00:00",
+  "timestamp": "2024-06-02T01:11:45.875014+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -2559,7 +2559,7 @@
       "labels": [],
       "body": "My idea for #42\r\n\r\n1.  Added a subsection \"### Extending ACME Order Objects with ARI\"\r\n2.  Added an \"Interoperability Considerations\" section.  I've seen this in a handful of specs over the years.  \r\n\r\nNotes:\r\n\r\n1. I just defined the fields with \"as defined in the aforementioned `renewalInfo` resource\"\r\n2. The only messy thing about this approach is we have \"Retry-After\" as a header on the resource URL, and it's migrated to a \"retryAfter\" field within the account object.  I don't like that, but I dislike even more the idea of making the \"Retry-After\" header a field in the resource URL.\r\n",
       "createdAt": "2023-06-23T21:37:09Z",
-      "updatedAt": "2024-03-18T16:10:47Z",
+      "updatedAt": "2024-05-30T14:02:43Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "deb034b727523a28c43d3b2407339d17baf10e0e",
