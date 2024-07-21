@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-18T01:10:09.355423+00:00",
+  "timestamp": "2024-07-21T01:16:23.739375+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -616,15 +616,15 @@
       "id": "I_kwDOGGBRNc5qMZ8i",
       "title": "Consider recommending clients log and audit \"immediate renewal\" scenarios as a best-practice",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/46",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "jvanasco",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Consider a subsection under the \"Getting Renewal Information\" titled \"Immediate Renewal Scenarios\".  \r\n\r\nIt should explain some situations in which a \"renew now\" payload is sent, and a security audit or server configuration audit may be necessary.\r\n\r\nPossible text:\r\n\r\n```\r\n## Immediate Renewal Scenarios\r\n\r\nIf the `end` of the `suggestedWindow` is in the past, clients **SHOULD** attempt renewal immediately.\r\n\r\nInstances like this **SHOULD** be logged and investigated.  If the ARI payload contains an `explanationUrl`, it should be logged and reviewed.\r\n\r\nThere are three main scenarios that will cause a Certificate to require immediate renewal:\r\n\r\n* The Certificate has been revoked through the ACME API.  This is often due to an intended action of the Certificate's owner, but this can be due to the result of a malicious actor who obtains the credentials necessary for revocation.  \r\n* The Certificate has been revoked by the Certificate Authority in a mass revocation event.  This could be due to a minor violation of the CA/B Baseline Requirements or a significant security concern.\r\n* The client has failed to refresh ARI information on the recommended basis. This could be due to the client or a scheduler being incorrectly configured.\r\n\r\nThe above list is not exhaustive; other scenarios can require immediate renewal.  It is recommended that all immediate renewal situations are logged and audited.  In situations where there is a security concern, such as an unintended revocation, subscribers should ensure the revocation was an unintended consequence of their actions and not due to a security compromise.  Subscribers may decide to inspect Certificate Transparent Logs for the affected domains.  In situations where there may be a misconfiguration of the client or a scheduler, subscribers should audit their integrations to ensure future Certificates are renewed in a timely manner.\r\n```\r\n",
       "createdAt": "2023-06-29T23:38:00Z",
-      "updatedAt": "2024-05-20T23:35:26Z",
-      "closedAt": null,
+      "updatedAt": "2024-07-18T23:17:09Z",
+      "closedAt": "2024-07-18T23:17:09Z",
       "comments": [
         {
           "author": "mholt",
@@ -1045,15 +1045,15 @@
       "id": "I_kwDOGGBRNc6C-rhB",
       "title": "Conveying renewal urgency on a per-account basis",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/65",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "djc",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "I am the CTO of Instant Labs, we host some ~1500 domains with sites for our customers. I wrote the [instant-acme](https://github.com/instant-labs/instant-acme) client for our use cases. As such, I have followed the developments around ARI with some interest. Personally I feel that making one request per certificate appears to be quite wasteful, and like @mholt in their recent email thread (https://mailarchive.ietf.org/arch/msg/acme/AeJ3zJKcBF-ZUhQXJajC0bb7orI/) I wonder if there isn't a better way to do this?\r\n\r\nI briefly discussed with Jacob HA whether it would be feasible to have a per-account endpoint that would just yield all the certificates that need updating in the next time window, but he mentioned that this would lead to highly variable response times which would be inconvenient for servers.\r\n\r\nWhich leads me to this proposal: would it be feasible to have an endpoint that just identifies the first certificate which needs renewal along with the date/time on which it should renew? This would allow clients to make a request to this endpoint and immediately go back to sleep until the given date/time.\r\n\r\n(Our current approach is storing the certificate expiry explicitly in our database alongside the certificate, we wake up a worker process every few hours to query all certificates that expire in the next 30 days and start the renewal process. Under my proposal, our worker process would check the first-renewal endpoint when it is first started, wait until the window arrives and then run again. If the window has arrived, it would do the renewal and look at the first-renewal endpoint again, etc.)",
       "createdAt": "2024-03-20T12:55:03Z",
-      "updatedAt": "2024-03-27T13:40:55Z",
-      "closedAt": null,
+      "updatedAt": "2024-07-18T23:36:51Z",
+      "closedAt": "2024-07-18T23:36:51Z",
       "comments": [
         {
           "author": "mholt",
@@ -1110,6 +1110,13 @@
           "body": "> As Matt suggested, the next obvious development from here is \"what if we polled once per account instead of once per certificate?\". I see two possible return values for this per-account polled endpoint:\r\n> \r\n> 1. It returns the single next certificate to renew. During a mass revocation event, a client which only polls the per-account endpoint every X minutes could easily fall behind, and a client which re-polls the per-account endpoint after each replacement would end up making just as many queries as one which is polling on a per-certificate basis.\r\n> \r\n> 2. It returns the whole collection of certificates which should be renewed right now. This results in all the same highly-variable response times, highly-variable response sizes, and paging issues as we've discussed before.\r\n\r\nI think I was suggesting an enumerated response, which can either have\r\n\r\n* `checkBackIn`: next window when the client should check in, or\r\n* `renewCertificate`: a certificate ID that requires renewal, and the client should check in again after renewal\r\n\r\nThis would mean that \"idle\" clients (for which there are no upcoming renewals) can be given a longer window and only have to send one request per account (instead of one request per certificate), while \"busy\" clients (for which there are upcoming renewals) will hit the endpoint once after each renewal to find the next renewal.\r\n\r\nI guess a downside might be that very busy accounts (for which there is an upcoming renewal a majority of the time) are sort of \"rate-limited\"? Not sure if that would be perceived as a good thing or a bad thing?",
           "createdAt": "2024-03-27T13:40:39Z",
           "updatedAt": "2024-03-27T13:40:55Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Apologies for not replying to this last comment earlier.\r\n\r\n> I think I was suggesting an enumerated response, which can either have\r\n> \r\n> * `checkBackIn`: next window when the client should check in, or\r\n> * `renewCertificate`: a certificate ID that requires renewal, and the client should check in again after renewal\r\n\r\nI think this defeats too much of the purpose of ARI, and places _too much_ onus on the ACME server. The point is to give clients actionable information ahead of time, so that the clients can make intelligent decisions. If the only response a client gets is \"oops, now it's time to renew this one!\" it will be stuck in a constant tight loop, never making any headway. A client which queries ARI on a per-certificate basis and discovers that 100 certs all should be renewed in the same window can distribute those tasks to 100 different servers.\r\n\r\nWhile this proposal does resolve some of the variable-response-size concerns of other per-account polling proposals, I don't think it actually solves any real problems and certainly creates other problems.",
+          "createdAt": "2024-07-18T23:36:51Z",
+          "updatedAt": "2024-07-18T23:36:51Z"
         }
       ]
     },
@@ -1149,15 +1156,15 @@
       "id": "I_kwDOGGBRNc6HxIA5",
       "title": "When to poll again if server does not send Retry-After?",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/69",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "mholt",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Section 4.2 says:\r\n\r\n> The server SHOULD include a Retry-After header indicating the polling interval that the ACME server recommends. Conforming clients SHOULD query the renewalInfo URL again after the Retry-After period has passed, as the server may provide a different suggestedWindow.\r\n\r\nBecause of SHOULD instead of MUST, what should clients do for poll timing if the Retry-After header is omitted?\r\n\r\nThe only potentially relevant advice I can find is at the end of the section:\r\n\r\n> If the client receives no response or a malformed response (e.g. an end timestamp which is equal to or precedes the start timestamp), it SHOULD make its own determination of when to renew the certificate, and MAY retry the renewalInfo request with appropriate exponential backoff behavior.\r\n\r\nBut this seems to be related more to error handling and not a successful response without a Retry-After header. If we were to do exponential backoff as the norm (i.e. with successful responses), we'd likely end up hammering the endpoint at first and then potentially missing the window later!\r\n\r\nShould we poll every... hour? Day? 2 hours? 10 minutes? I guess I'm looking for what to do in practice here. Thanks",
       "createdAt": "2024-05-03T14:29:33Z",
-      "updatedAt": "2024-05-20T23:22:00Z",
-      "closedAt": null,
+      "updatedAt": "2024-07-18T23:16:00Z",
+      "closedAt": "2024-07-18T23:16:00Z",
       "comments": [
         {
           "author": "mholt",
@@ -2552,21 +2559,21 @@
       "id": "PR_kwDOGGBRNc5TyWxF",
       "title": "Extend the ACME Order object with the ARI Payload",
       "url": "https://github.com/aarongable/draft-acme-ari/pull/45",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "jvanasco",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "My idea for #42\r\n\r\n1.  Added a subsection \"### Extending ACME Order Objects with ARI\"\r\n2.  Added an \"Interoperability Considerations\" section.  I've seen this in a handful of specs over the years.  \r\n\r\nNotes:\r\n\r\n1. I just defined the fields with \"as defined in the aforementioned `renewalInfo` resource\"\r\n2. The only messy thing about this approach is we have \"Retry-After\" as a header on the resource URL, and it's migrated to a \"retryAfter\" field within the account object.  I don't like that, but I dislike even more the idea of making the \"Retry-After\" header a field in the resource URL.\r\n",
       "createdAt": "2023-06-23T21:37:09Z",
-      "updatedAt": "2024-05-30T14:02:43Z",
+      "updatedAt": "2024-07-18T23:40:31Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "deb034b727523a28c43d3b2407339d17baf10e0e",
       "headRepository": "jvanasco/draft-acme-ari",
       "headRefName": "feature-acme_order_payload",
       "headRefOid": "974d435fe5b7101acfa57915a71e8de449ddfcb1",
-      "closedAt": null,
+      "closedAt": "2024-07-18T23:40:30Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -2591,6 +2598,13 @@
           "body": "Resubmitted via a force-push, as the other options were merge-commits or a new PR.\r\n\r\nNote: in two places (\"Interoperability Considerations\" and \"ACME Order Object Fields\"), `renewalInfo` was added above `replaces` for alphabetical ordering.\r\n",
           "createdAt": "2023-08-11T20:11:33Z",
           "updatedAt": "2023-08-11T20:11:33Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "At this point I no longer believe that this extension is necessary. It saves a grand total of one ARI query across the lifetime of the certificate, adds per-certificate information to the Order object (which causes issues with multi-cert-per-order extensions like ACME STAR), and co-mingles two different ACME resources inside a single object (which is done nowhere else in the protocol). As such I think I'm going to abandon this potential change. Thank you for the idea and work!",
+          "createdAt": "2024-07-18T23:40:30Z",
+          "updatedAt": "2024-07-18T23:40:30Z"
         }
       ],
       "reviews": []
