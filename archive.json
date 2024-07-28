@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-07-25T01:11:30.222822+00:00",
+  "timestamp": "2024-07-28T01:16:49.982270+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1236,6 +1236,22 @@
           "updatedAt": "2024-05-03T23:01:06Z"
         }
       ]
+    },
+    {
+      "number": 72,
+      "id": "I_kwDOGGBRNc6Q_HOU",
+      "title": "Support `replaces` without `renewal-info` resource",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/72",
+      "state": "OPEN",
+      "author": "Radranic",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "From a reading of the draf there is no explicit indication that a server supports the `replaces` tag on new orders.\r\n\r\nI've been told that it should be related to the `renewal-info` resource, but from what I read of the draft that relation is not explicit. \r\n\r\nI also know this isn't just my understanding of the issue as at least one client (https://github.com/rmbolger/Posh-ACME/releases/tag/v4.24.0) that has added support for ARI is sending the `replaces` value to services without the `renewal-info` field.\r\n\r\nWhile a solution to this misunderstand could be to make the relation more explicit, I would prefer if the support for the `replaces` field could be advertised independently so that a server could choose to support this without explicitly needing to have a `renewal-info` endpoint if the server doesn't care when a renewal happens.",
+      "createdAt": "2024-07-26T15:21:31Z",
+      "updatedAt": "2024-07-26T15:21:31Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
