@@ -39,7 +39,7 @@ Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificat
 
 Allowing issuing CAs to suggest a period in which clients should renew their certificates enables for dynamic time-based load balancing. This allows a CA to better respond to exceptional circumstances. For example, a CA could suggest that clients renew prior to a mass-revocation event to mitigate the impact of the revocation, or a CA could suggest that clients renew earlier than they normally would to reduce the size of an upcoming mass-renewal spike.
 
-This document specifies a mechanism by which ACME servers may provide suggested renewal windows to ACME clients, and by which ACME clients may inform ACME servers that a certificate has been renewed and replaced.
+This document specifies ACME Renewal Information (ARI), a mechanism by which ACME servers may provide suggested renewal windows to ACME clients, and by which ACME clients may inform ACME servers that a certificate has been renewed and replaced.
 
 # Conventions and Definitions
 
