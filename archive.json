@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-15T01:09:39.942421+00:00",
+  "timestamp": "2024-08-18T01:17:11.806907+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -790,7 +790,7 @@
       "labels": [],
       "body": "> The HTTP 409 Conflict response status code indicates a request conflict with the current state of the target resource.\r\n\r\nEven perfect record-keeping on the part of the client can be undermined by unexpected data and/or power loss. Providing an error code which indicates that the client should retry the renewal without the 'replaces' field would be helpful.\r\n\r\nCredit to @jsha for this idea.",
       "createdAt": "2024-02-23T23:12:51Z",
-      "updatedAt": "2024-03-06T15:04:06Z",
+      "updatedAt": "2024-08-16T22:42:49Z",
       "closedAt": null,
       "comments": [
         {
@@ -890,6 +890,20 @@
           "body": "> - Some \"replaces\" fields the server will not process, due to server policy -- the identified certificate was issued to the wrong account, or with a non-overlapping set of names, or any other reason that the server determines.\r\n> - Some \"replaces\" fields the server would process, because they meet all the criteria... but it cannot, because the identified certificate has already been replaced.\r\n\r\nI disagree that a server \"cannot\" in that second scenario.  Choosing to reject a `replaces` value because the identified certificate has already been replaced is also down to server policy (_\"Servers MAY ignore the replaces field in New Order requests which do not pass such checks\"_; note that \"MAY\" does not dictate required behaviour).  But having said that...\r\n\r\n> The former can be handled with a malformed error and a 400 response code\r\n\r\nIf we're in agreement that servers MUST always return an error when rejecting a submitted `replaces` value, then I don't object to using 409 just for the \"already renewed\" case and 400 for other error conditions.  I'll let you paint the bikeshed.  ;-)",
           "createdAt": "2024-03-06T15:04:05Z",
           "updatedAt": "2024-03-06T15:04:05Z"
+        },
+        {
+          "author": "felixfontein",
+          "authorAssociation": "NONE",
+          "body": "Sorry for being (very) late to this discussion, but:\r\n\r\n> The CA should return a 409 when an existing replacement order is already Finalized, Pending, Ready, or Processing. If that order becomes Invalid, another replacement order can be made.\r\n\r\nWould it be possible to provide the URL of that order in the error document or some HTTP header? That would allow clients to continue with that order (after checking that it's indeed what they want) instead of having to retry without `replaces`.",
+          "createdAt": "2024-08-15T18:32:03Z",
+          "updatedAt": "2024-08-15T18:32:03Z"
+        },
+        {
+          "author": "gregtwallace",
+          "authorAssociation": "NONE",
+          "body": "I was working on some code to implement this yesterday and am glad to see others have realized the same issue I came here to report.\r\n\r\nThat said, I would suggest possibly defining a new specific error for:\r\n\r\n> Some \"replaces\" fields the server will not process, due to server policy -- the identified certificate was issued to the wrong account, or with a non-overlapping set of names, or any other reason that the server determines.\r\n\r\nMaybe something like `malformed:replaces`. This would make it obvious the issue isn't some other type of 'malformed'.",
+          "createdAt": "2024-08-16T22:42:47Z",
+          "updatedAt": "2024-08-16T22:42:47Z"
         }
       ]
     },
@@ -1242,16 +1256,80 @@
       "id": "I_kwDOGGBRNc6Q_HOU",
       "title": "Support `replaces` without `renewal-info` resource",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/72",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Radranic",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
-      "body": "From a reading of the draf there is no explicit indication that a server supports the `replaces` tag on new orders.\r\n\r\nI've been told that it should be related to the `renewal-info` resource, but from what I read of the draft that relation is not explicit. \r\n\r\nI also know this isn't just my understanding of the issue as at least one client (https://github.com/rmbolger/Posh-ACME/releases/tag/v4.24.0) that has added support for ARI is sending the `replaces` value to services without the `renewal-info` field.\r\n\r\nWhile a solution to this misunderstand could be to make the relation more explicit, I would prefer if the support for the `replaces` field could be advertised independently so that a server could choose to support this without explicitly needing to have a `renewal-info` endpoint if the server doesn't care when a renewal happens.",
+      "body": "From a reading of the draft there is no explicit indication that a server supports the `replaces` tag on new orders.\r\n\r\nI've been told that it should be related to the `renewal-info` resource, but from what I read of the draft that relation is not explicit. \r\n\r\nI also know this isn't just my understanding of the issue as at least one client (https://github.com/rmbolger/Posh-ACME/releases/tag/v4.24.0) that has added support for ARI is sending the `replaces` value to services without the `renewal-info` field.\r\n\r\nWhile a solution to this misunderstand could be to make the relation more explicit, I would prefer if the support for the `replaces` field could be advertised independently so that a server could choose to support this without explicitly needing to have a `renewal-info` endpoint if the server doesn't care when a renewal happens.",
       "createdAt": "2024-07-26T15:21:31Z",
-      "updatedAt": "2024-07-26T15:21:31Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2024-08-16T14:41:40Z",
+      "closedAt": "2024-08-16T12:32:05Z",
+      "comments": [
+        {
+          "author": "rmbolger",
+          "authorAssociation": "NONE",
+          "body": ">  (https://github.com/rmbolger/Posh-ACME/releases/tag/v4.24.0) that has added support for ARI is sending the replaces value to services without the renewal-info field.\r\n\r\nPosh-ACME has indeed added support for ARI, but it shouldn't be sending the `replaces` value for new orders unless the server's directory endpoint has the `renewalInfo` endpoint.\r\n\r\nhttps://github.com/rmbolger/Posh-ACME/blob/6b0b3c1d584d0551ce724c2eba23f66d3476c539/Posh-ACME/Public/New-PAOrder.ps1#L201-L205",
+          "createdAt": "2024-08-15T15:05:34Z",
+          "updatedAt": "2024-08-15T15:05:34Z"
+        },
+        {
+          "author": "Radranic",
+          "authorAssociation": "NONE",
+          "body": "Is that a confirmation that there is no intent to be able to support the `replaces` value without including the `renewalInfo` endpoint?",
+          "createdAt": "2024-08-15T15:21:28Z",
+          "updatedAt": "2024-08-15T15:21:28Z"
+        },
+        {
+          "author": "rmbolger",
+          "authorAssociation": "NONE",
+          "body": "I would think that any ACME CA supporting the `replaces` value would implicitly be supporting the `renewalInfo` field since they're ultimately both part of the ARI spec. I don't see how else a client would know it was supported.",
+          "createdAt": "2024-08-15T15:31:18Z",
+          "updatedAt": "2024-08-15T15:31:18Z"
+        },
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "Also, when replaces is set, the server _SHOULD_ do some strict verifications to make sure the account is authorized to indicate a certificate is replaced, etc. So it (likely) follows that it should not be set if ARI is not supported at all. Setting it when it is not intended is grounds for errors.",
+          "createdAt": "2024-08-15T15:39:35Z",
+          "updatedAt": "2024-08-15T15:39:35Z"
+        },
+        {
+          "author": "Radranic",
+          "authorAssociation": "NONE",
+          "body": "> I would think that any ACME CA supporting the `replaces` value would implicitly be supporting the `renewalInfo` field since they're ultimately both part of the ARI spec. I don't see how else a client would know it was supported.\r\n\r\nI am asking for this to be added. A way to indicate `replaces` is supported without needing `renewalInfo`.\r\n\r\n> Also, when replaces is set, the server _SHOULD_ do some strict verifications to make sure the account is authorized to indicate a certificate is replaced, etc. So it (likely) follows that it should not be set if ARI is not supported at all. Setting it when it is not intended is grounds for errors.\r\n\r\nI have never disagreed with the validation requirements.\r\n\r\nI am asking why both features of ARI are bound into the same setting? Why can they not be both separate features? Or maybe at least a way in the `renewalInfo` to indicate \"this server does not care when you renew your cert\".\r\n\r\nThe way ARI is now, a server can't make use of order tracking via the replace without having to have some kind of logic to decide what \"good\" renewal info times are, even if the server is under no load constraints.\r\n\r\nMaybe add a field to the `meta` section of the directory similar to the `externalAccountRequired`. If it does not exist, replace is not supported, if it does exist and is true, then orders can be replaced.",
+          "createdAt": "2024-08-15T18:27:18Z",
+          "updatedAt": "2024-08-15T20:01:39Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Fundamentally, the purpose of this draft is not to enable order tracking, it's to enable rapid replacement of certificates. If someone is considering implementing _just_ the \"replaces\" field of this spec without implementing the renewal-info endpoint, I would encourage them to instead implement both.\r\n\r\nAt this time I do not intend to create a second separate indicator for whether or not the server supports the \"replaces\" field.\r\n\r\nI will update the document to indicate that clients SHOULD NOT include the \"replaces\" field in new-order requests if the server does not advertise a renewal-info endpoint in its directory.",
+          "createdAt": "2024-08-15T23:28:10Z",
+          "updatedAt": "2024-08-15T23:28:10Z"
+        },
+        {
+          "author": "Radranic",
+          "authorAssociation": "NONE",
+          "body": "I get how the `renewalInfo` aims for those goals, but it's unfortunate that a useful feature such as `replaces` can't be used explicitly independently.\r\n\r\nFrom reading it I guess my only solution is to intentionally make an invalid `renewalInfo` or `suggestedWindow` inside it and hope that clients follow the \"SHOULD make its own determination\". \r\n\r\nI don't think Posh-ACME does proper checking on the suggested time in case the end is before the start, so an invalid response is probably the better bet.\r\n\r\nThank you for the conversation.\r\n\r\n",
+          "createdAt": "2024-08-16T12:32:05Z",
+          "updatedAt": "2024-08-16T12:32:05Z"
+        },
+        {
+          "author": "rmbolger",
+          "authorAssociation": "NONE",
+          "body": "@Radranic If you think there's a problem with Posh-ACME's ARI implementation that should be fixed, feel free to create an issue [over there](https://github.com/rmbolger/Posh-ACME/issues). But we shouldn't clutter the RFC draft repo with that discussion.",
+          "createdAt": "2024-08-16T14:06:02Z",
+          "updatedAt": "2024-08-16T14:06:02Z"
+        },
+        {
+          "author": "Radranic",
+          "authorAssociation": "NONE",
+          "body": "@rmbolger, I don't have any problem with the implementation. I was just mentioning that an example current implementation doesn't do something in that is marked as SHOULD for ARI, which limits ways to get around the \"must have renewalInfo\" requirement. \r\n\r\nI suspect a server that is intentionally trying to trigger failure case behavior of the RFC draft to trigger specific behaviors of a client isn't something that anyone here wants to specifically fix, so I'm not worried about the behavior.",
+          "createdAt": "2024-08-16T14:41:39Z",
+          "updatedAt": "2024-08-16T14:41:39Z"
+        }
+      ]
     }
   ],
   "pulls": [
