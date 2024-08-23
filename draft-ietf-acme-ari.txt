@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                           6 August 2024
-Expires: 7 February 2025
+Intended status: Standards Track                          23 August 2024
+Expires: 24 February 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 February 2025.
+   This Internet-Draft will expire on 24 February 2025.
 
 Copyright Notice
 
@@ -83,6 +83,7 @@ Table of Contents
      7.1.  ACME Resource Type
      7.2.  ACME Renewal Info Object Fields
      7.3.  ACME Order Object Fields
+     7.4.  ACME Error Types
    8.  References
      8.1.  Normative References
      8.2.  Informative References
@@ -290,7 +291,9 @@ Table of Contents
 
    Clients SHOULD include this field in New Order requests if there is a
    clear predecessor certificate, as is the case for most certificate
-   renewals.
+   renewals.  Clients SHOULD NOT include this field if the ACME Server
+   has not indicated that it supports this protocol by advertising the
+   renewalInfo resource in its Directory.
 
    POST /acme/new-order HTTP/1.1
    Host: example.com
@@ -319,6 +322,10 @@ Table of Contents
    "invalid".  Correspondence checks beyond this (such as requiring
    exact identifier matching) are left up to Server policy.  If any of
    these checks fail, the Server SHOULD reject the new-order request.
+   If the Server rejects the request because the identified certificate
+   has already been marked as replaced, it MUST return an HTTP 409
+   (Conflict) with a problem document of type "alreadyReplaced" (see
+   Section 7.4).
 
    If the Server accepts a new-order request with a "replaces" field, it
    MUST reflect that field in the response and in subsequent requests
@@ -414,6 +421,23 @@ Table of Contents
         +------------+------------+--------------+---------------+
 
                                  Table 4
+
+7.4.  ACME Error Types
+
+   IANA will add the following entry to the "ACME Error Types" registry
+   within the "Automated Certificate Management Environment (ACME)
+   Protocol" registry group at https://www.iana.org/assignments/acme
+   (https://www.iana.org/assignments/acme):
+
+    +=================+===================================+===========+
+    | Type            | Description                       | Reference |
+    +=================+===================================+===========+
+    | alreadyReplaced | The request specified a           | This      |
+    |                 | predecessor certificate which has | document  |
+    |                 | already been marked as replaced   |           |
+    +-----------------+-----------------------------------+-----------+
+
+                                  Table 5
 
 8.  References
 
