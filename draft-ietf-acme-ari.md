@@ -150,7 +150,7 @@ In order to convey information regarding which certificate requests represent re
 
 `replaces` (string, optional): A string uniquely identifying a previously-issued certificate which this order is intended to replace. This unique identifier is constructed in the same way as the path component for GET requests described above.
 
-Clients **SHOULD** include this field in New Order requests if there is a clear predecessor certificate, as is the case for most certificate renewals.
+Clients **SHOULD** include this field in New Order requests if there is a clear predecessor certificate, as is the case for most certificate renewals. Clients **SHOULD NOT** include this field if the ACME Server has not indicated that it supports this protocol by advertising the `renewalInfo` resource in its Directory.
 
 ~~~ text
 POST /acme/new-order HTTP/1.1
