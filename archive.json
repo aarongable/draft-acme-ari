@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-22T01:14:12.872803+00:00",
+  "timestamp": "2024-08-25T01:18:56.493122+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -783,15 +783,15 @@
       "id": "I_kwDOGGBRNc6AQ_VF",
       "title": "Return HTTP 409 \"Conflict\" when the certificate identified by 'replaces' has already been replaced",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/56",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "beautifulentropy",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "> The HTTP 409 Conflict response status code indicates a request conflict with the current state of the target resource.\r\n\r\nEven perfect record-keeping on the part of the client can be undermined by unexpected data and/or power loss. Providing an error code which indicates that the client should retry the renewal without the 'replaces' field would be helpful.\r\n\r\nCredit to @jsha for this idea.",
       "createdAt": "2024-02-23T23:12:51Z",
-      "updatedAt": "2024-08-16T22:42:49Z",
-      "closedAt": null,
+      "updatedAt": "2024-08-23T22:42:30Z",
+      "closedAt": "2024-08-23T22:42:30Z",
       "comments": [
         {
           "author": "aarongable",
@@ -1330,6 +1330,22 @@
           "updatedAt": "2024-08-16T14:41:39Z"
         }
       ]
+    },
+    {
+      "number": 73,
+      "id": "I_kwDOGGBRNc6UFYbF",
+      "title": "Provide URL to replacing order on `alreadyReplaced` errors",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/73",
+      "state": "OPEN",
+      "author": "felixfontein",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "It would be really helpful to client writers if a `alreadyReplaced` error would include the URL of the order that replaced the certificate.\r\n\r\nI'm not sure how expensive that would be to implement. I checked out Pebble, there the conflict is detected by checking a flag of the original order that's replaced. Using the ID of the replacing order instead of a boolean flag would be a rather simple change. I also checked Boulder; there a function `ReplacementOrderExists` is called to determine whether there's a replacing order, which basically only returns a boolean. I checked out its implementation, it also has the ID of the replacement order available, so it would be easy (as in: no DB changes, as data is already readily available) to change to also return that one.\r\n\r\nAs for how to return it, providing it as a `Location` header or as a part of the error document is both fine for me, as long as it is specified how it is returned :)",
+      "createdAt": "2024-08-24T09:36:49Z",
+      "updatedAt": "2024-08-24T09:36:49Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
