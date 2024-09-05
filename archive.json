@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-03T01:15:14.373577+00:00",
+  "timestamp": "2024-09-05T01:16:36.471665+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1352,16 +1352,38 @@
       "id": "I_kwDOGGBRNc6U8_M0",
       "title": "Update `alreadyReplaced` to `replaces` or similar",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/74",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "gregtwallace",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Continuing the discussion from: https://github.com/aarongable/draft-acme-ari/issues/56\r\n\r\nTl'dr: If a client doesn't understand why the order is malformed, it would have to send a guess after removing the `replaces` field to see if that was the problem.\r\n\r\n---\r\n\r\nOther issues with the `replaces` field are currently ambiguous. Instead of defining `alreadyReplaced` define a single error such as `replaces` or `replacesField`. If the server returns 409 with this error, it is clear the certificate was already replaced. If the server returns any other error code with this error, it is clear the `replaces` field is the problem, but the certificate has not already been replaced.\r\n\r\nThis is helpful for telling clients that they MAY (or maybe even SHOULD) drop the `replaces` field and try again. If this doesn't exist and a client receives a generic error (e.g., `malformed`) the client would need to send the order again without `replaces` to find out if that was the malformed field or if there was a different issue.\r\n\r\nThis in turn will likely lead clients to perform the order again without the `replaces` field regardless of error, which will unncessarily double the new order request if the error was caused by something other than the `replaces` field.\r\n",
       "createdAt": "2024-08-31T19:20:06Z",
-      "updatedAt": "2024-08-31T19:20:06Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2024-09-03T23:43:06Z",
+      "closedAt": "2024-09-03T23:43:06Z",
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Sorry, I don't understand what you're proposing. It sounds like you want to rename `urn:ietf:params:acme:error:alreadyReplaced` to `urn:ietf:params:acme:error:replacesField` (which doesn't sound like an error to me) and then have the meaning of that error be context-dependent depending on what HTTP error code accompanies the problem document? I don't understand the benefit this would bring and it would be a significant departure from how other ACME errors are used both in the specification and in practice.",
+          "createdAt": "2024-09-03T17:12:10Z",
+          "updatedAt": "2024-09-03T17:12:10Z"
+        },
+        {
+          "author": "gregtwallace",
+          "authorAssociation": "NONE",
+          "body": "I'm not wed to any particular solution. I'm just trying to raise a potential issue for clients. \r\n\r\nThe scenario is there is an error with the `replaces` field on a submitted order that is NOT an already replaced error. For example, the server rejects the `replaces` field due to the list of identifiers not being a perfect match. This rejection should be distinguishable via a defined error vs. using a generic error like `malformed`. The client will see this defined error and know to remove the `replaces` field and resubmit the order. If the error is generic, the client would have to \"guess\" what the problem is, perhaps by removing the `replaces` field and retrying. In the event the generic error meant a problem other than `replaces` this is a pointless resubmission as it will just error again.\r\n\r\nPerhaps an error `badReplaces` or `malformedReplaces` might be a better name. I'm not familiar with the URN formatting, but maybe even something like `urn:ietf:params:acme:error:malformed:replaces`.",
+          "createdAt": "2024-09-03T22:17:39Z",
+          "updatedAt": "2024-09-03T22:19:39Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Ah thank you, now I understand. I guess my question is:\r\n\r\n> This rejection should be distinguishable via a defined error vs. using a generic error like `malformed`.\r\n\r\nWhy? The rest of the ACME protocol does not make such distinctions -- today there are a dozen different reasons why a newOrder request might be rejected with reason `malformed`, and none of them are distinguishable. I don't believe that the `replaces` field should be special in that regard. And if the ACME Server does want to provide more detail, the problem document format already has a mechanism for that: subproblems. For example, a server could provide one subproblem for each field of the request which has an issue.\r\n\r\nThe reason we have a new `alreadyReplaced` error type is because it is describing a truly new condition: the request was fully valid, but the client and server state appear to be out of sync (the client believes the prior cert still needs to be replaced, while the server believes it already has been). I don't believe there's a need for other kinds of errors to reflect more generic issues that could arise with this field.",
+          "createdAt": "2024-09-03T23:43:06Z",
+          "updatedAt": "2024-09-03T23:43:06Z"
+        }
+      ]
     }
   ],
   "pulls": [
