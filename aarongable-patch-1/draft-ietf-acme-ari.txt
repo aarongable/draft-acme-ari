@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                          23 August 2024
-Expires: 24 February 2025
+Intended status: Standards Track                         10 October 2024
+Expires: 13 April 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 24 February 2025.
+   This Internet-Draft will expire on 13 April 2025.
 
 Copyright Notice
 
@@ -179,7 +179,7 @@ Table of Contents
    URL.
 
    The path component is a unique identifier for the certificate in
-   question.  The unique identifer is constructed by concatenating the
+   question.  The unique identifier is constructed by concatenating the
    base64url-encoding [RFC4648] of the bytes of the keyIdentifier field
    of certificate's Authority Key Identifier (AKI) [RFC5280] extension,
    a literal period, and the base64url-encoding of the bytes of the DER
