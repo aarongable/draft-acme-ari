@@ -86,7 +86,7 @@ The "`renewalInfo`" resource is a new resource type introduced to ACME protocol.
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The path component is a unique identifier for the certificate in question. The unique identifer is constructed by concatenating the base64url-encoding [@!RFC4648] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the bytes of the DER encoding of the certificate's Serial Number (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
+The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding [@!RFC4648] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the bytes of the DER encoding of the certificate's Serial Number (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
 
 Thus the full request url is constructed as follows, where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
 
