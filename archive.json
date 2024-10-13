@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-10T01:20:05.566482+00:00",
+  "timestamp": "2024-10-13T01:25:43.616369+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1384,6 +1384,22 @@
           "updatedAt": "2024-09-03T23:43:06Z"
         }
       ]
+    },
+    {
+      "number": 76,
+      "id": "I_kwDOGGBRNc6Z55rE",
+      "title": "WGLC feedback from Corey Bonnell",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/76",
+      "state": "OPEN",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "- A normative reference to RFC 7231 is needed for the Retry-After header.\r\n- Consider adding guidance for appropriate selection of Retry-After values. Likely this guidance will need to instruct ACME server operators to be aware of some of the policy specific elements (e.g., revocation timelines) of the PKI in which the ACME server operates. For example, a Retry-After value of 86400 would not be sufficient for the TLS webPKI, as the TLS Baseline Requirements requires revocation within 24 hours in certain circumstances; a more aggressive cadence is needed.\r\n- In section 4.1, replace \u201cAKI\u201d with \u201cAKI keyIdentifier\u201d in the ASCII diagram to make it clear that only the keyIdentifier field of the AKI extension is included and not the other fields of the AKI extension. The prose above says this, but consistency in both the prose and the diagram would make this clear.",
+      "createdAt": "2024-10-11T19:54:05Z",
+      "updatedAt": "2024-10-11T19:54:05Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -3226,6 +3242,34 @@
           "updatedAt": "2024-04-11T10:26:19Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 75,
+      "id": "PR_kwDOGGBRNc5-PKP5",
+      "title": "Fix typo in Section 4.1",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/75",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "identifer -> identifier",
+      "createdAt": "2024-10-10T14:59:29Z",
+      "updatedAt": "2024-10-10T15:02:33Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "2e1d1ed53c7253e6b30fab3a33767fa716d11f5e",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "aarongable-patch-1",
+      "headRefOid": "b55f572c6ea080b66ffc22c378b160313289f4fb",
+      "closedAt": "2024-10-10T15:02:32Z",
+      "mergedAt": "2024-10-10T15:02:31Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "12729b982aa024eb41bcd37bb519c3408a914b96"
+      },
+      "comments": [],
       "reviews": []
     }
   ]
