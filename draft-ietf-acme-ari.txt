@@ -187,11 +187,13 @@ Table of Contents
    length bytes).  All trailing "=" characters MUST be stripped from
    both parts of the unique identifier.
 
-   Thus the full request url is constructed as follows, where the "||"
-   operator indicates string concatenation and the renewalInfo url is
-   taken from the Directory object:
+   Thus the full request url is constructed as follows (split onto
+   multiple lines for readability), where the "||" operator indicates
+   string concatenation and the renewalInfo url is taken from the
+   Directory object:
 
-   url = renewalInfo || '/' || base64url(AKI) || '.' || base64url(Serial)
+   url = renewalInfo || '/' ||
+         base64url(AKI keyIdentifier) || '.' || base64url(Serial)
 
    For example, to request renewal information for the end-entity
    certificate given in Appendix A, the client would make the request as
