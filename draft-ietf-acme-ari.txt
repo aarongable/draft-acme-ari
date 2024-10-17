@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                         10 October 2024
-Expires: 13 April 2025
+Intended status: Standards Track                         17 October 2024
+Expires: 20 April 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 April 2025.
+   This Internet-Draft will expire on 20 April 2025.
 
 Copyright Notice
 
@@ -242,10 +242,14 @@ Table of Contents
      "explanationURL": "https://example.com/docs/ari"
    }
 
-   The server SHOULD include a Retry-After header indicating the polling
-   interval that the ACME server recommends.  Conforming clients SHOULD
-   query the renewalInfo URL again after the Retry-After period has
-   passed, as the server may provide a different suggestedWindow.
+   The server SHOULD include a Retry-After header [RFC7231] indicating
+   the polling interval that the ACME server recommends.  Servers should
+   select a value for this header based on their own operational
+   capabilities (e.g. how many requests per second they can handle) and
+   the regulatory enviornment in which they operate (e.g. mandated
+   revocation timelines).  Conforming clients SHOULD query the
+   renewalInfo URL again when the Retry-After period has passed, as the
+   server may provide a different suggestedWindow.
 
    Conforming clients MUST attempt renewal at a time of their choosing
    based on the suggested renewal window.  The following algorithm is
@@ -461,6 +465,11 @@ Table of Contents
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/info/rfc5280>.
+
+   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
+              Protocol (HTTP/1.1): Semantics and Content", RFC 7231,
+              DOI 10.17487/RFC7231, June 2014,
+              <https://www.rfc-editor.org/info/rfc7231>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
