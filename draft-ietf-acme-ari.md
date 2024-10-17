@@ -88,10 +88,11 @@ To request the suggested renewal information for a certificate, the client sends
 
 The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding [@!RFC4648] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the bytes of the DER encoding of the certificate's Serial Number (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
 
-Thus the full request url is constructed as follows, where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
+Thus the full request url is constructed as follows (split onto multiple lines for readability), where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
 
 ~~~ text
-url = renewalInfo || '/' || base64url(AKI) || '.' || base64url(Serial)
+url = renewalInfo || '/' ||
+      base64url(AKI keyIdentifier) || '.' || base64url(Serial)
 ~~~
 
 For example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the request as follows:
