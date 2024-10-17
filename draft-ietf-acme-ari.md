@@ -127,7 +127,7 @@ Retry-After: 21600
 }
 ~~~
 
-The server **SHOULD** include a `Retry-After` header indicating the polling interval that the ACME server recommends. Conforming clients **SHOULD** query the `renewalInfo` URL again after the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
+The server **SHOULD** include a `Retry-After` header [@!RFC7231] indicating the polling interval that the ACME server recommends. Servers should select a value for this header based on their own operational capabilities (e.g. how many requests per second they can handle) and the regulatory enviornment in which they operate (e.g. mandated revocation timelines). Conforming clients **SHOULD** query the `renewalInfo` URL again when the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
 
 Conforming clients **MUST** attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is **RECOMMENDED** for choosing a renewal time:
 
