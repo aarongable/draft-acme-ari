@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-15T01:21:39.377302+00:00",
+  "timestamp": "2024-10-17T01:20:54.822789+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1413,7 +1413,7 @@
       "labels": [],
       "body": "Hi, our team is evaluating whether we can handle certificate revocation cases automatically. We're excited about ARI, but all the exposed interfaces currently rely on polling.\r\n\r\nGiven that we may manage up to 640k certificates, periodically querying each domain isn't practical. Would it be possible to provide a callback API during the certificate creation process? This way, we could receive notifications for unexpected revocations directly for the relevant domains.",
       "createdAt": "2024-10-14T20:10:32Z",
-      "updatedAt": "2024-10-15T00:16:12Z",
+      "updatedAt": "2024-10-15T22:08:50Z",
       "closedAt": null,
       "comments": [
         {
@@ -1422,6 +1422,58 @@
           "body": "I'm trying to find the thread, but this was discussed on the Let's Encrypt forums this year, and I'm not sure if a consensus was reached, but it seems that the burden is on the clients to poll. I advocated for a more client-scaling-friendly design, but that was rejected in favor of a simpler (?) ARI server implementation.",
           "createdAt": "2024-10-15T00:16:11Z",
           "updatedAt": "2024-10-15T00:16:11Z"
+        },
+        {
+          "author": "webprofusion-chrisc",
+          "authorAssociation": "NONE",
+          "body": "@DongWangAakamai Cross referencing your post on the Let's Encrypt forum: https://community.letsencrypt.org/t/can-ari-send-a-notification-with-callback-url-when-a-certificate-is-about-to-expire-unexpectedly-or-outside-the-planned-schedule/227329\r\n\r\nI do like the idea of an optional callback API (e.g. maybe a request to `/.well-known/acme-ari-notification` with the certID and account public key to prompt further checks or work).\r\n\r\nDomains may not be websites and there is still a question of the opposite burden for a mass revocation ( as the CA would need to make the 640K notification calls to you), so instead perhaps it could just be a notification of the affected account ID (and public key), so the consumer can them go off and run their own ARI checks for each cert. \r\n\r\nAccounts would therefore need to be able to nominate a callback domain, which is an additional implementation burden for the CA, who many not currently have much other account metadata to handle.\r\n\r\n",
+          "createdAt": "2024-10-15T03:03:05Z",
+          "updatedAt": "2024-10-15T03:05:23Z"
+        },
+        {
+          "author": "andrewachen",
+          "authorAssociation": "NONE",
+          "body": "Agree that a centralized callback for all certificates on an account would make sense, both from the scale and \"domains may not be websites\" perspectives.",
+          "createdAt": "2024-10-15T22:08:49Z",
+          "updatedAt": "2024-10-15T22:08:49Z"
+        }
+      ]
+    },
+    {
+      "number": 78,
+      "id": "I_kwDOGGBRNc6aYOQF",
+      "title": "Enhancement Proposal: Aggregate Endpoint for Efficient Certificate Management in Large Fleets",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/78",
+      "state": "OPEN",
+      "author": "jmcrawford45",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I would like to propose an enhancement to the ARI extension that could be beneficial for users managing large fleets of certificates. Specifically, I suggest optionally allowing Certificate Authorities to return all information matching certain constraints under a given account key.\r\n\r\nBackground:\r\n\r\nWe manage a large fleet of a few hundred thousand certificates. Currently, the process involves making individual requests for each certificate, which can be resource-intensive and stateful.\r\n\r\nProposed Enhancement:\r\n\r\nIntroduce an optional feature that allows CAs to provide an aggregate endpoint where accounts can retrieve all relevant information matching specified constraints under a given account key. For example, an account may be interested in exceptional cases with a small upcoming window outside of the expected value or that include a specific explanation url.\r\nThis feature would help reduce the load on both the client and server by minimizing the number of requests needed for  renewing large fleets under a single account, particularly in response to mass revocation events.\r\nIt would also simplify client-side operations by reducing the amount of state that needs to be maintained.\r\n\r\nBenefits:\r\n\r\nImproved efficiency for managing large numbers of certificates.\r\nReduced server load and network traffic.\r\nSimplified client-side implementation and maintenance.\r\nI believe this feature could be valuable for other users with similar needs like #77. Thank you for considering this proposal.",
+      "createdAt": "2024-10-15T22:06:24Z",
+      "updatedAt": "2024-10-16T14:10:36Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "I would like this too, but it has already been discussed and rejected: https://github.com/aarongable/draft-acme-ari/issues/41\r\n\r\nAgain, the spec authors seem to prefer simpler server implementations and more complex client implementations, as opposed to more of a middle ground that balances complexity.",
+          "createdAt": "2024-10-15T22:24:34Z",
+          "updatedAt": "2024-10-15T22:27:18Z"
+        },
+        {
+          "author": "jmcrawford45",
+          "authorAssociation": "NONE",
+          "body": "Thank you for sharing the prior context. @aarongable would the page-able per-account endpoint still be an option under consideration? I think this would still provide most of the benefits I mentioned here (reducing RPS and allowing clients to keep less state). We'd still need to apply the filters on constraints client side, but perhaps this approach strikes a better balance for large fleets than the current get with id endpoint. ",
+          "createdAt": "2024-10-16T13:16:34Z",
+          "updatedAt": "2024-10-16T13:16:34Z"
+        },
+        {
+          "author": "webprofusion-chrisc",
+          "authorAssociation": "NONE",
+          "body": "I'd suggest that the main point of interest for anyone is that their account has _exceptional_ ARI status they should be aware of, so they can then go off and poll ARI status per cert (or get a download for their whole account). The main objection I'm seeing so far from client authors is that they don't feel that polling for every cert every day scales particularly well.",
+          "createdAt": "2024-10-16T14:10:35Z",
+          "updatedAt": "2024-10-16T14:10:35Z"
         }
       ]
     }
