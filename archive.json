@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-17T01:20:54.822789+00:00",
+  "timestamp": "2024-10-20T01:27:14.487529+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1336,16 +1336,24 @@
       "id": "I_kwDOGGBRNc6UFYbF",
       "title": "Provide URL to replacing order on `alreadyReplaced` errors",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/73",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "felixfontein",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "It would be really helpful to client writers if a `alreadyReplaced` error would include the URL of the order that replaced the certificate.\r\n\r\nI'm not sure how expensive that would be to implement. I checked out Pebble, there the conflict is detected by checking a flag of the original order that's replaced. Using the ID of the replacing order instead of a boolean flag would be a rather simple change. I also checked Boulder; there a function `ReplacementOrderExists` is called to determine whether there's a replacing order, which basically only returns a boolean. I checked out its implementation, it also has the ID of the replacement order available, so it would be easy (as in: no DB changes, as data is already readily available) to change to also return that one.\r\n\r\nAs for how to return it, providing it as a `Location` header or as a part of the error document is both fine for me, as long as it is specified how it is returned :)",
       "createdAt": "2024-08-24T09:36:49Z",
-      "updatedAt": "2024-08-24T09:36:49Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2024-10-17T16:43:21Z",
+      "closedAt": "2024-10-17T16:43:21Z",
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "ACME problem documents do not have a precedent for containing additional machine-readable error information like this. While I find this idea interesting, I don't think this is the right place to blaze new trail in this direction.",
+          "createdAt": "2024-10-17T16:43:21Z",
+          "updatedAt": "2024-10-17T16:43:21Z"
+        }
+      ]
     },
     {
       "number": 74,
@@ -1390,15 +1398,17 @@
       "id": "I_kwDOGGBRNc6Z55rE",
       "title": "WGLC feedback from Corey Bonnell",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/76",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "aarongable",
       "authorAssociation": "OWNER",
-      "assignees": [],
+      "assignees": [
+        "aarongable"
+      ],
       "labels": [],
       "body": "- A normative reference to RFC 7231 is needed for the Retry-After header.\r\n- Consider adding guidance for appropriate selection of Retry-After values. Likely this guidance will need to instruct ACME server operators to be aware of some of the policy specific elements (e.g., revocation timelines) of the PKI in which the ACME server operates. For example, a Retry-After value of 86400 would not be sufficient for the TLS webPKI, as the TLS Baseline Requirements requires revocation within 24 hours in certain circumstances; a more aggressive cadence is needed.\r\n- In section 4.1, replace \u201cAKI\u201d with \u201cAKI keyIdentifier\u201d in the ASCII diagram to make it clear that only the keyIdentifier field of the AKI extension is included and not the other fields of the AKI extension. The prose above says this, but consistency in both the prose and the diagram would make this clear.",
       "createdAt": "2024-10-11T19:54:05Z",
-      "updatedAt": "2024-10-11T19:54:05Z",
-      "closedAt": null,
+      "updatedAt": "2024-10-17T16:40:55Z",
+      "closedAt": "2024-10-17T16:40:55Z",
       "comments": []
     },
     {
@@ -1406,15 +1416,15 @@
       "id": "I_kwDOGGBRNc6aMZ-_",
       "title": "Can ARI send a notification with callback URL when a certificate is about to expire unexpectedly or outside the planned schedule?",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/77",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "DongWangAakamai",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Hi, our team is evaluating whether we can handle certificate revocation cases automatically. We're excited about ARI, but all the exposed interfaces currently rely on polling.\r\n\r\nGiven that we may manage up to 640k certificates, periodically querying each domain isn't practical. Would it be possible to provide a callback API during the certificate creation process? This way, we could receive notifications for unexpected revocations directly for the relevant domains.",
       "createdAt": "2024-10-14T20:10:32Z",
-      "updatedAt": "2024-10-15T22:08:50Z",
-      "closedAt": null,
+      "updatedAt": "2024-10-19T00:12:21Z",
+      "closedAt": "2024-10-17T21:33:13Z",
       "comments": [
         {
           "author": "mholt",
@@ -1436,6 +1446,27 @@
           "body": "Agree that a centralized callback for all certificates on an account would make sense, both from the scale and \"domains may not be websites\" perspectives.",
           "createdAt": "2024-10-15T22:08:49Z",
           "updatedAt": "2024-10-15T22:08:49Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Hi folks, thanks for the feature request! Unfortunately, as I said on the LE Community Forum post, I don't think this idea is practical for a number of reasons.\r\n\r\nFirst and foremost, spiky traffic is bad. Whether that's the ACME Server suddenly making millions of outbound requests to notify Clients about ARI changes, or a Client suddenly making thousands of inbound ARI requests in response to a single account-wide callback, this proposal involves long periods of quiet followed by bursts of high traffic. Solutions that involve steady-state traffic are much easier to implement, test, budget for, and keep working in the long term. That applies to both Servers and Clients.\r\n\r\nSecondly, I think adoption would be very very low. IETF RFCs are supposed to represent \"rough consensus and running code\" and I think the number of ACME clients which implement this would be vanishingly small for one simple reason: most ACME clients aren't exposed to the public internet, _and that's a good thing_. While some ACME clients are integrated into webservers (caddy), the vast majority are either small sidecars (certbot, acem.sh) or large separate services (like what akamai, cloudflare, etc wrote for their own use). These have no reason to be exposed to the web, and exposing them would either require significant new integrations with their accompanying webservers, or open the door to new vulnerabilities if they are handling HTTP traffic themselves.\r\n\r\nFinally, and perhaps most importantly, this callback-based model doesn't fit well with the problems ARI is trying to solve. Sure, it might work well for handling the \"oh no, renew these now due to an upcoming mass revocation\" case. But what about simple load balancing, as described in the draft's introduction? If the server sends a new notification every time it adjusts a cert's suggested renewal window, that could be an unbounded number of notifications depending on how its load balancing algorithm works. If the server only sends a notification when it thinks the cert should be renewed, and it thinks the cert should be renewed _late_, the client is forced to choose between ignoring ARI and renewing early, or waiting for a notification that may never come (what if ARI was accidentally broken for a time).\r\n\r\nAll in all, I think this proposal introduces too much complexity and not enough benefit to be included at this late of a stage (Working Group Last Call) in the draft's lifecycle.",
+          "createdAt": "2024-10-17T18:10:38Z",
+          "updatedAt": "2024-10-17T18:10:38Z"
+        },
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "Fair points, although I have a question:\r\n\r\n> If the server sends a new notification every time it adjusts a cert's suggested renewal window, that could be an unbounded number of notifications depending on how its load balancing algorithm works.\r\n\r\nIsn't the same true in the reverse? i.e. a load balancing algorithm that might change renewal windows often, the clients will have to poll just as frequently as a server would have to push out notifications, in order to get the updated window?",
+          "createdAt": "2024-10-18T16:05:54Z",
+          "updatedAt": "2024-10-18T16:05:54Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "I don't think so. The point of client polling is to get updates at a reasonable pace. The client can decide how quickly it wants to be informed based on the operational characteristics of the associated website, and the server can provide suggestions (Retry-After) based on the regulatory environment of its PKI. Meanwhile the server can be adjusting the suggested window as often as it likes, or even dynamically generating the suggested window when it receives each request.\r\n\r\nThat doesn't work in reverse. Dynamically-generated windows become impossible, as does Retry-After-based rate limiting (because each request from the ACME Server would be unique, not retries). It's not even necessarily clear which certificates belong to the same client identity -- do you cluster by ACME account ID, by hostname, by eTLD+1, or some combination? -- so it's very hard for the server to tell what \"too much\" traffic is for the client.",
+          "createdAt": "2024-10-19T00:12:20Z",
+          "updatedAt": "2024-10-19T00:12:20Z"
         }
       ]
     },
@@ -1451,7 +1482,7 @@
       "labels": [],
       "body": "I would like to propose an enhancement to the ARI extension that could be beneficial for users managing large fleets of certificates. Specifically, I suggest optionally allowing Certificate Authorities to return all information matching certain constraints under a given account key.\r\n\r\nBackground:\r\n\r\nWe manage a large fleet of a few hundred thousand certificates. Currently, the process involves making individual requests for each certificate, which can be resource-intensive and stateful.\r\n\r\nProposed Enhancement:\r\n\r\nIntroduce an optional feature that allows CAs to provide an aggregate endpoint where accounts can retrieve all relevant information matching specified constraints under a given account key. For example, an account may be interested in exceptional cases with a small upcoming window outside of the expected value or that include a specific explanation url.\r\nThis feature would help reduce the load on both the client and server by minimizing the number of requests needed for  renewing large fleets under a single account, particularly in response to mass revocation events.\r\nIt would also simplify client-side operations by reducing the amount of state that needs to be maintained.\r\n\r\nBenefits:\r\n\r\nImproved efficiency for managing large numbers of certificates.\r\nReduced server load and network traffic.\r\nSimplified client-side implementation and maintenance.\r\nI believe this feature could be valuable for other users with similar needs like #77. Thank you for considering this proposal.",
       "createdAt": "2024-10-15T22:06:24Z",
-      "updatedAt": "2024-10-16T14:10:36Z",
+      "updatedAt": "2024-10-17T18:41:21Z",
       "closedAt": null,
       "comments": [
         {
@@ -1474,6 +1505,13 @@
           "body": "I'd suggest that the main point of interest for anyone is that their account has _exceptional_ ARI status they should be aware of, so they can then go off and poll ARI status per cert (or get a download for their whole account). The main objection I'm seeing so far from client authors is that they don't feel that polling for every cert every day scales particularly well.",
           "createdAt": "2024-10-16T14:10:35Z",
           "updatedAt": "2024-10-16T14:10:35Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Hi, thanks for the feature request! As said above, this idea has been discussed and rejected earlier in the draft's lifecycle. I'm not opposed to the idea as a general concept, but I have yet to see a _specific_ proposal that is convincingly both efficient and simple.\r\n\r\nAt this point we're in Working Group Last Call, so a proposal for a new feature like this needs to be much more precise and fleshed out. For example:\r\n- What URL is this bulk request made to?\r\n- What set of HTTP methods (POST, GET, POST-as-GET) are acceptable, and how does their behavior differ, if at all?\r\n- What sort of constraints can be specified, and how are those included in the request?\r\n- What does the response look like? In particular, how does it associate renewal windows with individual certificates?\r\n- What happens if the number of entries in the response is too high? (In particular, if you are proposing pagination, what is the pagination or cursoring scheme?)\r\n- Can you point to a client or server implementation of this proposal?\r\n\r\nI think the simplest possible proposal for a bulk endpoint would be \"POST to the directory's `renewalInfo` endpoint with a JSON list of CertIDs; the server rejects the request if the list is too long or if any CertID doesn't belong to the requesting account, and otherwise responds with a JSON object mapping each requested CertID to its suggested renewal window\". It's not clear to me if this would satisfy the desires of large client operators.",
+          "createdAt": "2024-10-17T18:39:55Z",
+          "updatedAt": "2024-10-17T18:41:21Z"
         }
       ]
     }
@@ -3344,6 +3382,62 @@
       "mergedBy": "aarongable",
       "mergeCommit": {
         "oid": "12729b982aa024eb41bcd37bb519c3408a914b96"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 79,
+      "id": "PR_kwDOGGBRNc5-_nda",
+      "title": "Improve Retry-After paragraph",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/79",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Part of https://github.com/aarongable/draft-acme-ari/issues/76",
+      "createdAt": "2024-10-17T16:36:15Z",
+      "updatedAt": "2024-10-17T16:39:33Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "12729b982aa024eb41bcd37bb519c3408a914b96",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "retry-after",
+      "headRefOid": "3eb1b160626da484a51f5cf8745fb722d4ad673a",
+      "closedAt": "2024-10-17T16:39:31Z",
+      "mergedAt": "2024-10-17T16:39:31Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "5922b05b8e90cb7d90b9fe546fe713dbd6bd8db9"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 80,
+      "id": "PR_kwDOGGBRNc5-_os_",
+      "title": "Improve URL construction diagram",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/80",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes https://github.com/aarongable/draft-acme-ari/issues/76",
+      "createdAt": "2024-10-17T16:39:36Z",
+      "updatedAt": "2024-10-17T16:40:55Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "5922b05b8e90cb7d90b9fe546fe713dbd6bd8db9",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "aki-naming",
+      "headRefOid": "ac79e63c6a5f3aeef266c7bdb536122df0409526",
+      "closedAt": "2024-10-17T16:40:54Z",
+      "mergedAt": "2024-10-17T16:40:54Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "f9a1990a42e921cc9aaf602f8a71614563b057ee"
       },
       "comments": [],
       "reviews": []
