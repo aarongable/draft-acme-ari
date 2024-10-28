@@ -128,7 +128,7 @@ Retry-After: 21600
 }
 ~~~
 
-The server **SHOULD** include a `Retry-After` header [@!RFC7231] indicating the polling interval that the ACME server recommends. Servers should select a value for this header based on their own operational capabilities (e.g. how many requests per second they can handle) and the regulatory enviornment in which they operate (e.g. mandated revocation timelines). Conforming clients **SHOULD** query the `renewalInfo` URL again when the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
+The server **SHOULD** include a `Retry-After` header [@!RFC7231] indicating the polling interval that the ACME server recommends. Servers should select a value for this header based on their own operational capabilities (e.g. how many requests per second they can handle) and the regulatory environment in which they operate (e.g. mandated revocation timelines). Conforming clients **SHOULD** query the `renewalInfo` URL again when the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
 
 Conforming clients **MUST** attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is **RECOMMENDED** for choosing a renewal time:
 
@@ -175,7 +175,7 @@ Content-Type: application/jose+json
 }
 ~~~
 
-Servers **SHOULD** check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different Order that is not "invalid". Correspondence checks beyond this (such as requiring exact identifier matching) are left up to Server policy. If any of these checks fail, the Server **SHOULD** reject the new-order request. If the Server rejects the request because the identified certificate has already been marked as replaced, it **MUST** return an HTTP 409 (Conflict) with a problem document of type "alreadyReplaced" (see Section 7.4).
+Servers **SHOULD** check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different Order that is not "invalid". Correspondence checks beyond this (such as requiring exact identifier matching) are left up to Server policy. If any of these checks fails, the Server **SHOULD** reject the new-order request. If the Server rejects the request because the identified certificate has already been marked as replaced, it **MUST** return an HTTP 409 (Conflict) with a problem document of type "alreadyReplaced" (see Section 7.4).
 
 If the Server accepts a new-order request with a "replaces" field, it **MUST** reflect that field in the response and in subsequent requests for the corresponding Order object.
 
