@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-27T01:26:44.022174+00:00",
+  "timestamp": "2024-10-29T01:22:41.777509+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -3441,6 +3441,68 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 81,
+      "id": "PR_kwDOGGBRNc6AKwEf",
+      "title": "spell: enviornment -> environment",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/81",
+      "state": "MERGED",
+      "author": "jsha",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Also subject-verb agreement \"any ... fails\"",
+      "createdAt": "2024-10-28T23:00:27Z",
+      "updatedAt": "2024-10-28T23:27:57Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "f9a1990a42e921cc9aaf602f8a71614563b057ee",
+      "headRepository": "jsha/draft-acme-ari",
+      "headRefName": "spell-and-grammar",
+      "headRefOid": "63e81baa1344aa98c3ff8cdd5221dd3258ebf10c",
+      "closedAt": "2024-10-28T23:27:57Z",
+      "mergedAt": "2024-10-28T23:27:57Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "232f0384790b97e2310d1f24ed7c4fcff8c26dcd"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc6PE6Q2",
+          "commit": {
+            "abbreviatedOid": "64aebb4"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-10-28T23:26:57Z",
+          "updatedAt": "2024-10-28T23:26:57Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "I _think_ the original text here is correct: because \"checks\" is a countable noun, the phrase \"any of these checks\" acts as a plural noun phrase, and therefore needs the plural form of the verb (\"fail\").\r\n\r\nIf the noun were indivisible (like \"any of the water\"), then it would act like a singular noun and require the singular form of the verb (\"fails\").\r\n\r\nThis can be made clear by substituting \"the checks\" with the equivalent pronoun \"them\": \"If any of them fail\" is clearly correct while \"If any of them fails\" is clearly not.\r\n```suggestion\r\nServers **SHOULD** check that the identified certificate and the New Order request correspond to the same ACME Account, that they share at least one identifier, and that the identified certificate has not already been marked as replaced by a different Order that is not \"invalid\". Correspondence checks beyond this (such as requiring exact identifier matching) are left up to Server policy. If any of these checks fail, the Server **SHOULD** reject the new-order request. If the Server rejects the request because the identified certificate has already been marked as replaced, it **MUST** return an HTTP 409 (Conflict) with a problem document of type \"alreadyReplaced\" (see Section 7.4).\r\n```",
+              "createdAt": "2024-10-28T23:26:57Z",
+              "updatedAt": "2024-10-28T23:26:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6PE6WI",
+          "commit": {
+            "abbreviatedOid": "63e81ba"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-10-28T23:27:19Z",
+          "updatedAt": "2024-10-28T23:27:19Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
