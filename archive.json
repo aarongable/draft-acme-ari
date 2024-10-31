@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-29T01:22:41.777509+00:00",
+  "timestamp": "2024-10-31T01:22:26.055295+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -3501,6 +3501,77 @@
           "createdAt": "2024-10-28T23:27:19Z",
           "updatedAt": "2024-10-28T23:27:19Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 82,
+      "id": "PR_kwDOGGBRNc6ASs1o",
+      "title": "Clarify schedule on which clients should check",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/82",
+      "state": "OPEN",
+      "author": "jsha",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The checking interval is an important property of the system, since it determines whether all relevant clients will check ARI before any given revocation event. Here I expand on the current language around Retry-After, both to emphasize the intended behavior and to flesh out error cases.",
+      "createdAt": "2024-10-29T20:06:36Z",
+      "updatedAt": "2024-10-30T07:20:04Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "232f0384790b97e2310d1f24ed7c4fcff8c26dcd",
+      "headRepository": "jsha/draft-acme-ari",
+      "headRefName": "checking-schedule",
+      "headRefOid": "dc8a0b6ea234c6ff47fc818710162a9bebb2b57b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc6PR3oK",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "Nice improvements and cleanup! Thanks for working on this too. Just a few nits and questions from my perspective as a client implementor.",
+          "createdAt": "2024-10-30T07:10:47Z",
+          "updatedAt": "2024-10-30T07:20:04Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "If it's invalid, what is a client to do about it?",
+              "createdAt": "2024-10-30T07:10:47Z",
+              "updatedAt": "2024-10-30T07:20:04Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "Did you mean servers? Clients don't set the header. Why should a client presume the server is wrong?\n\nReasonable seems arbitrary. Most servers will provably just implement the example. Just say they must do this maybe?",
+              "createdAt": "2024-10-30T07:12:38Z",
+              "updatedAt": "2024-10-30T07:20:04Z"
+            },
+            {
+              "originalPosition": 22,
+              "body": "Not MUST? Allowing them to check ARI afterwards seems like a waste of resources.",
+              "createdAt": "2024-10-30T07:14:54Z",
+              "updatedAt": "2024-10-30T07:20:04Z"
+            },
+            {
+              "originalPosition": 46,
+              "body": "This is \ud83d\udc4d ",
+              "createdAt": "2024-10-30T07:16:14Z",
+              "updatedAt": "2024-10-30T07:20:04Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "Ah so maybe this answers my first question.\n\nGood section imo.\n\nIs a 500 really short term though? Usually those require changes to the server to fix.\n\nAnd is 6 hours an example? The way it's worded makes it sound like it can be anything and doesn't really matter.",
+              "createdAt": "2024-10-30T07:17:02Z",
+              "updatedAt": "2024-10-30T07:20:04Z"
+            }
+          ]
         }
       ]
     }
