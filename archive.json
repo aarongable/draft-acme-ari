@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-11-07T01:19:35.411430+00:00",
+  "timestamp": "2024-11-10T01:24:25.967703+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -3516,7 +3516,7 @@
       "labels": [],
       "body": "The checking interval is an important property of the system, since it determines whether all relevant clients will check ARI before any given revocation event. Here I expand on the current language around Retry-After, both to emphasize the intended behavior and to flesh out error cases.",
       "createdAt": "2024-10-29T20:06:36Z",
-      "updatedAt": "2024-10-30T07:20:04Z",
+      "updatedAt": "2024-11-08T23:25:20Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "232f0384790b97e2310d1f24ed7c4fcff8c26dcd",
@@ -3527,7 +3527,22 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@aarongable all your changes look good, please go ahead!",
+          "createdAt": "2024-11-08T21:22:20Z",
+          "updatedAt": "2024-11-08T21:22:20Z"
+        },
+        {
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "body": "Yeah, good discussion/feedback so far. :+1: Thanks.",
+          "createdAt": "2024-11-08T23:25:18Z",
+          "updatedAt": "2024-11-08T23:25:18Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOGGBRNc6PR3oK",
@@ -3570,6 +3585,130 @@
               "body": "Ah so maybe this answers my first question.\n\nGood section imo.\n\nIs a 500 really short term though? Usually those require changes to the server to fix.\n\nAnd is 6 hours an example? The way it's worded makes it sound like it can be anything and doesn't really matter.",
               "createdAt": "2024-10-30T07:17:02Z",
               "updatedAt": "2024-10-30T07:20:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6Qhs1a",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Thank you so much for this contribution! I've left a few small editorial comments -- would you like to update this PR yourself, or are you fine with me doing some local editing and uploading the next commit myself?",
+          "createdAt": "2024-11-08T19:31:52Z",
+          "updatedAt": "2024-11-08T20:59:33Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\r\nA RenewalInfo object in which the `end` timestamp equals or precedes the `start` timestamp is invalid. Servers MUST NOT serve such a response, and clients MUST treat one as though they failed to receive any response from the server (e.g. retry at an appropriate interval, renew on a fallback schedule, etc.).\r\n```",
+              "createdAt": "2024-11-08T19:31:52Z",
+              "updatedAt": "2024-11-08T20:59:33Z"
+            },
+            {
+              "originalPosition": 18,
+              "body": "```suggestion\r\nRenewalInfo objects need to be fetched frequently enough that clients learn about renewal quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.\r\n```",
+              "createdAt": "2024-11-08T20:48:02Z",
+              "updatedAt": "2024-11-08T20:59:33Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "In this section, is it more correct to be talking about \"RenewalInfo _objects_\" or \"the RenewalInfo _resource_\"? I'm honestly unsure.",
+              "createdAt": "2024-11-08T20:49:24Z",
+              "updatedAt": "2024-11-08T20:59:33Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "I would move this section up to be immediately after the first paragraph of the parent section. That way the logical flow is\r\n1. Here's why retry-after is important\r\n2. Here's how servers should set it\r\n3. Here's how clients should respect it\r\n\r\nrather than having servers be an afterthought. I think this will reduce questions like Matt's question above, questioning why clients should have reasonable limits when it seems like servers should also have those reasonable limits.",
+              "createdAt": "2024-11-08T20:55:17Z",
+              "updatedAt": "2024-11-08T20:59:33Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\r\nClients SHOULD fetch a certificate's RenewalInfo object immediately after issuance. After that, clients SHOULD fetch the certificate's RenewalInfo as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the value in the Retry-After header. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.\r\n```",
+              "createdAt": "2024-11-08T20:55:52Z",
+              "updatedAt": "2024-11-08T20:59:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6QiU4P",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-08T21:05:09Z",
+          "updatedAt": "2024-11-08T21:05:09Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "> Did you mean servers? Clients don't set the header. Why should a client presume the server is wrong?\r\n\r\nI meant clients. A misbehaving server shouldn't be able to trigger obviously incorrect behavior from the client, like not checking renewal status again for 100,000 years. Or checking every 0 seconds.\r\n\r\n@aarongable : good suggestions.",
+              "createdAt": "2024-11-08T21:05:09Z",
+              "updatedAt": "2024-11-08T21:05:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6QiVZY",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-08T21:06:47Z",
+          "updatedAt": "2024-11-08T21:06:47Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "https://datatracker.ietf.org/doc/html/rfc2119#section-6\r\n\r\n> [6](https://datatracker.ietf.org/doc/html/rfc2119#section-6). Guidance in the use of these Imperatives\r\n>\r\n>   Imperatives of the type defined in this memo must be used with care\r\n>   and sparingly.  In particular, they MUST only be used where it is\r\n>   actually required for interoperation or to limit behavior which has\r\n>   potential for causing harm (e.g., limiting retransmisssions)  For\r\n>   example, they must not be used to try to impose a particular method\r\n>   on implementors where the method is not required for\r\n>   interoperability.\r\n\r\nThis probably falls under a similar heading as \"limiting retransmissions\", so yeah I think it makes sense to call this a MUST.",
+              "createdAt": "2024-11-08T21:06:47Z",
+              "updatedAt": "2024-11-08T21:06:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6QiX1k",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-08T21:13:37Z",
+          "updatedAt": "2024-11-08T21:13:37Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "The resource, good point.",
+              "createdAt": "2024-11-08T21:13:37Z",
+              "updatedAt": "2024-11-08T21:13:37Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6Qi4JC",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "mholt",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-08T23:24:12Z",
+          "updatedAt": "2024-11-08T23:24:12Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "Ah, okay, so maybe:\r\n\r\n> Clients SHOULD set reasonable limits on any value read from the Retry-After header.",
+              "createdAt": "2024-11-08T23:24:12Z",
+              "updatedAt": "2024-11-08T23:24:13Z"
             }
           ]
         }
