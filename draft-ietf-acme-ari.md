@@ -145,11 +145,17 @@ A RenewalInfo object in which the `end` timestamp equals or precedes the `start`
 
 ## Schedule for checking the RenewalInfo resource
 
-RenewalInfo objects need to be fetched frequently enough that clients learn about renewal quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
+Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance. Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
 
-Clients SHOULD fetch a certificate's RenewalInfo object immediately after issuance. After that, clients SHOULD fetch the certificate's RenewalInfo as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the value in the Retry-After header. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
+During the lifetime of a certificate, the renewal information need to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
 
-Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
+### Server choice of Retry-After
+
+Servers set the Retry-After header based on their requirements on how quickly to perform a revocation. For instance, a server that needs to revoke certificates within 24 hours of notification of a problem might choose to reserve twelve hours for investigation, six hours for clients to fetch RenewalInfo, and six hours for clients to perform a renewal. Setting a small value for Retry-After means that clients can respond more quickly, but also incurs more load on the server. Servers should estimate their expected load based on the number of clients, keeping in mind that third parties may also monitor RenewalInfo endpoints.
+
+### Client handling of Retry-After
+
+After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
 
 ### Error handling
 
@@ -170,10 +176,6 @@ Long term errors include, for instance:
   - Non-5xx HTTP error
 
 On receiving a long term error, clients SHOULD perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).
-
-### Server choice of Retry-After
-
-Servers set the Retry-After header based on their requirements on how quickly to perform a revocation. For instance, a server that needs to revoke certificates within 24 hours of notification of a problem might choose to reserve twelve hours for investigation, six hours for clients to fetch RenewalInfo, and six hours for clients to perform a renewal. Setting a small value for Retry-After means that clients can respond more quickly, but also incurs more load on the server. Servers should estimate their expected load based on the number of clients, keeping in mind that third parties may also monitor RenewalInfo endpoints.
 
 # Extensions to the Order Object
 
