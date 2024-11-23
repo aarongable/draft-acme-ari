@@ -141,15 +141,15 @@ In all cases, renewal attempts are subject to the client's existing error backof
 
 In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
-A RenewalInfo object in which the `end` timestamp equals or precedes the `start` timestamp is invalid.
+A RenewalInfo object in which the `end` timestamp equals or precedes the `start` timestamp is invalid. Servers MUST NOT serve such a response, and clients MUST treat one as though they failed to receive any response from the server (e.g. retry at an appropriate interval, renew on a fallback schedule, etc.).
 
-## Schedule for checking RenewalInfo objects
+## Schedule for checking the RenewalInfo resource
 
-RenewalInfo objects must be fetched frequently so that clients learn about renewal quickly. But requests must not overwhelm the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
+RenewalInfo objects need to be fetched frequently enough that clients learn about renewal quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
 
-Clients SHOULD fetch a certificate's RenewalInfo object immediately after issuance. After that, clients SHOULD fetch the certificate's RenewalInfo as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the value in the Retry-After header. For instance, values under 1 minute should be treated as if they were one minute and values over one day should be treated as if they were one day.
+Clients SHOULD fetch a certificate's RenewalInfo object immediately after issuance. After that, clients SHOULD fetch the certificate's RenewalInfo as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the value in the Retry-After header. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
 
-Clients SHOULD stop checking RenewalInfo after a certificate is expired. Clients SHOULD stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
+Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
 
 ### Error handling
 
