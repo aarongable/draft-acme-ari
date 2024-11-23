@@ -167,7 +167,7 @@ Temporary errors include, for instance:
 
 On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients SHOULD treat the request as a long-term error.
 
-Long term errors include, for instance: 
+Long term errors include, for instance:
 
   - Retry-After is invalid or not present
   - RenewalInfo object is invalid
