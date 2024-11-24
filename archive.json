@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-11-21T01:24:21.266761+00:00",
+  "timestamp": "2024-11-24T01:36:57.346442+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -3516,13 +3516,13 @@
       "labels": [],
       "body": "The checking interval is an important property of the system, since it determines whether all relevant clients will check ARI before any given revocation event. Here I expand on the current language around Retry-After, both to emphasize the intended behavior and to flesh out error cases.",
       "createdAt": "2024-10-29T20:06:36Z",
-      "updatedAt": "2024-11-08T23:25:20Z",
+      "updatedAt": "2024-11-23T02:35:09Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "232f0384790b97e2310d1f24ed7c4fcff8c26dcd",
       "headRepository": "jsha/draft-acme-ari",
       "headRefName": "checking-schedule",
-      "headRefOid": "dc8a0b6ea234c6ff47fc818710162a9bebb2b57b",
+      "headRefOid": "6c827b4f65d11e49d539464a948d7b4ca7b7512b",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -3541,6 +3541,13 @@
           "body": "Yeah, good discussion/feedback so far. :+1: Thanks.",
           "createdAt": "2024-11-08T23:25:18Z",
           "updatedAt": "2024-11-08T23:25:18Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "I've landed all of my proposed edits. Please take a look and if you think this still expresses the substance of your original contribution, I'll merge and tag one last release before this goes to IESG for reals.",
+          "createdAt": "2024-11-23T01:55:55Z",
+          "updatedAt": "2024-11-23T01:55:55Z"
         }
       ],
       "reviews": [
@@ -3709,6 +3716,66 @@
               "body": "Ah, okay, so maybe:\r\n\r\n> Clients SHOULD set reasonable limits on any value read from the Retry-After header.",
               "createdAt": "2024-11-08T23:24:12Z",
               "updatedAt": "2024-11-08T23:24:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6SZc6_",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-23T01:44:06Z",
+          "updatedAt": "2024-11-23T01:44:06Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "```suggestion\r\n## Schedule for checking the RenewalInfo resource\r\n```",
+              "createdAt": "2024-11-23T01:44:06Z",
+              "updatedAt": "2024-11-23T01:44:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6SZdEA",
+          "commit": {
+            "abbreviatedOid": "dc8a0b6"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-23T01:45:48Z",
+          "updatedAt": "2024-11-23T01:45:48Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "```suggestion\r\nClients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).\r\n```",
+              "createdAt": "2024-11-23T01:45:48Z",
+              "updatedAt": "2024-11-23T01:45:49Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6SZldG",
+          "commit": {
+            "abbreviatedOid": "6c827b4"
+          },
+          "author": "jcjones",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-11-23T02:35:09Z",
+          "updatedAt": "2024-11-23T02:35:09Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "From the perspective of the client a 500 is likely to be resolved without its intervention , by the server getting repaired.\r\n\r\nRetrying after six hours provides enough latitude that the herd won't be stampeding for tens of hours after a fault, which seems workable.",
+              "createdAt": "2024-11-23T02:35:09Z",
+              "updatedAt": "2024-11-23T02:35:09Z"
             }
           ]
         }
