@@ -35,11 +35,11 @@ Let's Encrypt's [Boulder](https://github.com/letsencrypt/boulder) software fully
 
 # Introduction
 
-Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g. via `cron`); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing Certification Authority (CA) changing certificate lifetimes. All three techniques lead to load clustering for the issuing CA.
+Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g. via `cron`); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing Certification Authority (CA) changing certificate lifetimes. All three techniques may lead to load clustering for the issuing CA due to the inability of the issuing CA to schedule renewal requests.
 
-Allowing issuing CAs to suggest a period in which clients should renew their certificates enables for dynamic time-based load balancing. This allows a CA to better respond to exceptional circumstances. For example, a CA could suggest that clients renew prior to a mass-revocation event to mitigate the impact of the revocation, or a CA could suggest that clients renew earlier than they normally would to reduce the size of an upcoming mass-renewal spike.
+Allowing issuing CAs to suggest a period in which clients should renew their certificates enables dynamic time-based load balancing. This allows a CA to better respond to exceptional circumstances. For example, a CA could suggest that clients renew prior to a mass-revocation event to mitigate the impact of the revocation, or a CA could suggest that clients renew earlier than they normally would to reduce the size of an upcoming mass-renewal spike.
 
-This document specifies ACME Renewal Information (ARI), a mechanism by which ACME servers may provide suggested renewal windows to ACME clients, and by which ACME clients may inform ACME servers that a certificate has been renewed and replaced.
+This document specifies ACME Renewal Information (ARI), a mechanism by which ACME servers may provide suggested renewal windows to ACME clients, and by which ACME clients may inform ACME servers that they have successfully renewed and replaced a certificate.
 
 # Conventions and Definitions
 
@@ -222,6 +222,8 @@ This replacement information may serve many purposes, including but not limited 
 The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section 10.1.
 
 This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
+
+Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, a server might place the suggested renewal window wholly in the past to encourage a client to renew immediately; but a client with a sufficiently slow clock might see the suggested window as still being in the future. Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not seed as a particular hindrance to this protocol.
 
 # IANA Considerations
 
