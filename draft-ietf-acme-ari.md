@@ -147,7 +147,7 @@ A RenewalInfo object in which the `end` timestamp equals or precedes the `start`
 
 Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance. Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
 
-During the lifetime of a certificate, the renewal information need to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
+During the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
 
 ### Server choice of Retry-After
 
