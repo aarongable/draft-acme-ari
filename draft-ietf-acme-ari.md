@@ -161,19 +161,19 @@ After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it a
 
 Temporary errors include, for instance:
 
-  - Connection timeout
-  - Request timeout
-  - 5xx HTTP errors.
+- Connection timeout
+- Request timeout
+- 5xx HTTP errors.
 
 On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients SHOULD treat the request as a long-term error.
 
 Long term errors include, for instance:
 
-  - Retry-After is invalid or not present
-  - RenewalInfo object is invalid
-  - DNS lookup failure
-  - Connection refused
-  - Non-5xx HTTP error
+- Retry-After is invalid or not present
+- RenewalInfo object is invalid
+- DNS lookup failure
+- Connection refused
+- Non-5xx HTTP error
 
 On receiving a long term error, clients SHOULD perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).
 
@@ -245,9 +245,9 @@ Registration Procedure: Specification Required
 
 Template:
 
-* Field name: The string to be used as a field name in the JSON object
-* Field type: The type of value to be provided, e.g., string, boolean, array of string
-* Reference: Where this field is defined
+- Field name: The string to be used as a field name in the JSON object
+- Field type: The type of value to be provided, e.g., string, boolean, array of string
+- Reference: Where this field is defined
 
 Initial contents:
 
