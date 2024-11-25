@@ -128,8 +128,6 @@ Retry-After: 21600
 }
 ~~~
 
-The server **SHOULD** include a `Retry-After` header [@!RFC7231] indicating the polling interval that the ACME server recommends. Servers should select a value for this header based on their own operational capabilities (e.g. how many requests per second they can handle) and the regulatory environment in which they operate (e.g. mandated revocation timelines). Conforming clients **SHOULD** query the `renewalInfo` URL again when the `Retry-After` period has passed, as the server may provide a different `suggestedWindow`.
-
 Conforming clients **MUST** attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is **RECOMMENDED** for choosing a renewal time:
 
   1. Query the `renewalInfo` resource to get a suggested renewal window.
@@ -143,7 +141,41 @@ In all cases, renewal attempts are subject to the client's existing error backof
 
 In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
-If the client receives no response or a malformed response (e.g. an `end` timestamp which is equal to or precedes the `start` timestamp), it **SHOULD** make its own determination of when to renew the certificate, and **MAY** retry the `renewalInfo` request with appropriate exponential backoff behavior.
+A RenewalInfo object in which the `end` timestamp equals or precedes the `start` timestamp is invalid. Servers MUST NOT serve such a response, and clients MUST treat one as though they failed to receive any response from the server (e.g. retry at an appropriate interval, renew on a fallback schedule, etc.).
+
+## Schedule for checking the RenewalInfo resource
+
+Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance. Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
+
+During the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
+
+### Server choice of Retry-After
+
+Servers set the Retry-After header based on their requirements on how quickly to perform a revocation. For instance, a server that needs to revoke certificates within 24 hours of notification of a problem might choose to reserve twelve hours for investigation, six hours for clients to fetch RenewalInfo, and six hours for clients to perform a renewal. Setting a small value for Retry-After means that clients can respond more quickly, but also incurs more load on the server. Servers should estimate their expected load based on the number of clients, keeping in mind that third parties may also monitor RenewalInfo endpoints.
+
+### Client handling of Retry-After
+
+After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
+
+### Error handling
+
+Temporary errors include, for instance:
+
+  - Connection timeout
+  - Request timeout
+  - 5xx HTTP errors.
+
+On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients SHOULD treat the request as a long-term error.
+
+Long term errors include, for instance:
+
+  - Retry-After is invalid or not present
+  - RenewalInfo object is invalid
+  - DNS lookup failure
+  - Connection refused
+  - Non-5xx HTTP error
+
+On receiving a long term error, clients SHOULD perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).
 
 # Extensions to the Order Object
 
