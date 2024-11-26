@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-11-24T01:36:57.346442+00:00",
+  "timestamp": "2024-11-26T01:25:36.411512+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -3509,24 +3509,26 @@
       "id": "PR_kwDOGGBRNc6ASs1o",
       "title": "Clarify schedule on which clients should check",
       "url": "https://github.com/aarongable/draft-acme-ari/pull/82",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "jsha",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The checking interval is an important property of the system, since it determines whether all relevant clients will check ARI before any given revocation event. Here I expand on the current language around Retry-After, both to emphasize the intended behavior and to flesh out error cases.",
       "createdAt": "2024-10-29T20:06:36Z",
-      "updatedAt": "2024-11-23T02:35:09Z",
+      "updatedAt": "2024-11-25T21:56:39Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "232f0384790b97e2310d1f24ed7c4fcff8c26dcd",
       "headRepository": "jsha/draft-acme-ari",
       "headRefName": "checking-schedule",
-      "headRefOid": "6c827b4f65d11e49d539464a948d7b4ca7b7512b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "a711d0562235071d364ffc5d973cb4633aa0fe59",
+      "closedAt": "2024-11-25T21:56:39Z",
+      "mergedAt": "2024-11-25T21:56:38Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "386254b69f6daeb2294ed05af044b235e01a065d"
+      },
       "comments": [
         {
           "author": "jsha",
@@ -3778,8 +3780,84 @@
               "updatedAt": "2024-11-23T02:35:09Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOGGBRNc6Sl_Ql",
+          "commit": {
+            "abbreviatedOid": "6c827b4"
+          },
+          "author": "jsha",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "I like the edits. One typo.",
+          "createdAt": "2024-11-25T19:16:35Z",
+          "updatedAt": "2024-11-25T19:16:54Z",
+          "comments": [
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\r\nDuring the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.\r\n```",
+              "createdAt": "2024-11-25T19:16:35Z",
+              "updatedAt": "2024-11-25T19:16:54Z"
+            }
+          ]
         }
       ]
+    },
+    {
+      "number": 83,
+      "id": "PR_kwDOGGBRNc6DGg_4",
+      "title": "Update normative reference for Retry-After header",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/83",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-11-25T22:01:19Z",
+      "updatedAt": "2024-11-25T22:20:24Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "386254b69f6daeb2294ed05af044b235e01a065d",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "aarongable-patch-1",
+      "headRefOid": "a3ee441820193540c9aec78e1aaeb7c7c7d64f81",
+      "closedAt": "2024-11-25T22:20:22Z",
+      "mergedAt": "2024-11-25T22:20:22Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "e24f207bb58e4b55e2022cee2696b917239352a7"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 84,
+      "id": "PR_kwDOGGBRNc6DHATC",
+      "title": "Improvements from DNSDIR feedback",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/84",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This addresses all feedback from Geoff Huston (DNSDIR), except for commentary on the formatting of object fields in sections 4.2 and 4.3, which I have not yet figured out how to change.",
+      "createdAt": "2024-11-25T23:46:54Z",
+      "updatedAt": "2024-11-25T23:47:02Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "e24f207bb58e4b55e2022cee2696b917239352a7",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "dnsdir-feedback",
+      "headRefOid": "49dfe9dbeb0931c99a9e69afcab198fe63414446",
+      "closedAt": "2024-11-25T23:47:01Z",
+      "mergedAt": "2024-11-25T23:47:01Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "ac7ce90f04acec3428cffd06ed95335f5a63a54c"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
