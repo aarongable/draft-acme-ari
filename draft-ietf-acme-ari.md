@@ -135,7 +135,7 @@ Conforming clients **MUST** attempt renewal at a time of their choosing based on
   3. If the selected time is in the past, attempt renewal immediately.
   4. Otherwise, if the client can schedule itself to attempt renewal at exactly the selected time, do so.
   5. Otherwise, if the selected time is before the next time that the client would wake up normally, attempt renewal immediately.
-  6. Otherwise, sleep until the `Retry-After` period has passed and return to Step 1.
+  6. Otherwise, sleep until the time indicated by the `Retry-After` header and return to Step 1.
 
 In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.
 
