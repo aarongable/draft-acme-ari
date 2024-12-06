@@ -1350,7 +1350,7 @@ Retry-After: 21600
 </li>
           <li id="section-4.2-6.5">Otherwise, if the selected time is before the next time that the client would wake up normally, attempt renewal immediately.<a href="#section-4.2-6.5" class="pilcrow">¶</a>
 </li>
-          <li id="section-4.2-6.6">Otherwise, sleep until the <code>Retry-After</code> period has passed and return to Step 1.<a href="#section-4.2-6.6" class="pilcrow">¶</a>
+          <li id="section-4.2-6.6">Otherwise, sleep until the time indicated by the <code>Retry-After</code> header and return to Step 1.<a href="#section-4.2-6.6" class="pilcrow">¶</a>
 </li>
         </ol>
 <p id="section-4.2-7">In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.<a href="#section-4.2-7" class="pilcrow">¶</a></p>
