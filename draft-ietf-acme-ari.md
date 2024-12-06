@@ -35,7 +35,7 @@ Let's Encrypt's [Boulder](https://github.com/letsencrypt/boulder) software fully
 
 # Introduction
 
-Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g. via `cron`); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing Certification Authority (CA) changing certificate lifetimes. All three techniques may lead to load clustering for the issuing CA due to the inability of the issuing CA to schedule renewal requests.
+Most ACME [@!RFC8555] clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g., via `cron`); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing Certification Authority (CA) changing certificate lifetimes. All three techniques may lead to load clustering for the issuing CA due to the inability of the issuing CA to schedule renewal requests.
 
 Allowing issuing CAs to suggest a period in which clients should renew their certificates enables dynamic time-based load balancing. This allows a CA to better respond to exceptional circumstances. For example, a CA could suggest that clients renew prior to a mass-revocation event to mitigate the impact of the revocation, or a CA could suggest that clients renew earlier than they normally would to reduce the size of an upcoming mass-renewal spike.
 
@@ -82,11 +82,11 @@ Content-Type: application/json
 
 ## The "renewalInfo" Resource
 
-The "`renewalInfo`" resource is a new resource type introduced to ACME protocol. This new resource allows clients to query the server for suggestions on when they should renew certificates.
+The "`renewalInfo`" resource is a new resource type introduced to the ACME protocol. This new resource allows clients to query the server for suggestions on when they should renew certificates.
 
 To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
 
-The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding [@!RFC4648] of the bytes of the `keyIdentifier` field of certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the bytes of the DER encoding of the certificate's Serial Number (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
+The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding [@!RFC4648] of the `keyIdentifier` field of the certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the DER-encoded Serial Number field (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
 
 Thus the full request url is constructed as follows (split onto multiple lines for readability), where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
 
@@ -112,7 +112,7 @@ The structure of an ACME `renewalInfo` resource is as follows:
 
 `suggestedWindow` (object, required): A JSON object with two keys, "`start`" and "`end`", whose values are timestamps, encoded in the format specified in [@!RFC3339], which bound the window of time in which the CA recommends renewing the certificate.
 
-`explanationURL` (string, optional): A URL pointing to a page which may explain why the suggested renewal window is what it is. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Conforming clients **SHOULD** provide this URL to their operator, if present.
+`explanationURL` (string, optional): A URL pointing to a page which may explain why the suggested renewal window has its current value. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Conforming clients **SHOULD** provide this URL to their operator, if present.
 
 ~~~ json
 HTTP/1.1 200 OK
@@ -141,7 +141,7 @@ In all cases, renewal attempts are subject to the client's existing error backof
 
 In particular, cron-based clients may find they need to increase their run frequency to check ARI more frequently. Those clients will need to store information about failures so that increasing their run frequency doesn't lead to retrying failures without proper backoff. Typical information stored should include: number of failures for a given order (defined by the set of names on the order), and time of the most recent failure.
 
-A RenewalInfo object in which the `end` timestamp equals or precedes the `start` timestamp is invalid. Servers MUST NOT serve such a response, and clients MUST treat one as though they failed to receive any response from the server (e.g. retry at an appropriate interval, renew on a fallback schedule, etc.).
+A RenewalInfo object in which the `end` timestamp equals or precedes the `start` timestamp is invalid. Servers MUST NOT serve such a response, and clients MUST treat one as though they failed to receive any response from the server (e.g., retry at an appropriate interval, renew on a fallback schedule, etc.).
 
 ## Schedule for checking the RenewalInfo resource
 
@@ -219,9 +219,9 @@ This replacement information may serve many purposes, including but not limited 
 
 # Security Considerations
 
-The extensions to the ACME protocol described in this document build upon the Security Considerations and threat model defined in [@!RFC8555], Section 10.1.
+The extensions to the ACME protocol described in this document builds upon the Security Considerations and threat model defined in [@!RFC8555], Section 10.1.
 
-This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed load from clients which do not respect the Retry-After header.
+This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed the load from clients which do not respect the Retry-After header. As always, servers should take measures to ensure that unauthenticated requests for renewal information cannot result in denial-of-service attacks. These measures might include ensuring that a cache does not include superfluous request headers or query parameters in its cache key, instituting IP-based rate limits, or other general best-practice measures.
 
 Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, a server might place the suggested renewal window wholly in the past to encourage a client to renew immediately; but a client with a sufficiently slow clock might see the suggested window as still being in the future. Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not seed as a particular hindrance to this protocol.
 
