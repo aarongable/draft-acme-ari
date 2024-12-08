@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-12-05T01:36:27.456620+00:00",
+  "timestamp": "2024-12-08T01:41:44.500988+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -3855,6 +3855,62 @@
       "mergedBy": "aarongable",
       "mergeCommit": {
         "oid": "ac7ce90f04acec3428cffd06ed95335f5a63a54c"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 85,
+      "id": "PR_kwDOGGBRNc6EXXiu",
+      "title": "Improvements from SECDIR feedback",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/85",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "- Fix a few typos and other typographical suggestions\r\n- Simplify the phrasing when describing the URL path construction\r\n- Add suggestions to mitigate the possibility of DoS attacks against this unauthenticated endpoint",
+      "createdAt": "2024-12-06T19:22:25Z",
+      "updatedAt": "2024-12-06T19:34:10Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "5b62889f3defae7873bcb82db07ab7a79bcce889",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "secdir-comments",
+      "headRefOid": "7611bd056d6573bc661f4ca1ee375c28296b3090",
+      "closedAt": "2024-12-06T19:34:08Z",
+      "mergedAt": "2024-12-06T19:34:08Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "2541ecefbc66f11009fb9e96cd3ee375a48bbb4a"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 86,
+      "id": "PR_kwDOGGBRNc6EXakz",
+      "title": "Improvements from TSVART feedback",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/86",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "- Remove ambiguity in recommended algorithm for how long client should sleep",
+      "createdAt": "2024-12-06T19:31:51Z",
+      "updatedAt": "2024-12-06T19:38:44Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "2541ecefbc66f11009fb9e96cd3ee375a48bbb4a",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "tsvart-comments",
+      "headRefOid": "e630b665b3848485a8f8a4a29f6720be067407e1",
+      "closedAt": "2024-12-06T19:38:42Z",
+      "mergedAt": "2024-12-06T19:38:42Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "d945f26efb41c0fa3c6b29102f731c9f085edca2"
       },
       "comments": [],
       "reviews": []
