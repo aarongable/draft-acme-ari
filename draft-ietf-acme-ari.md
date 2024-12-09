@@ -155,7 +155,7 @@ Servers set the Retry-After header based on their requirements on how quickly to
 
 ### Client handling of Retry-After
 
-After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
+After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
 
 ### Error handling
 
@@ -223,7 +223,7 @@ The extensions to the ACME protocol described in this document builds upon the S
 
 This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed the load from clients which do not respect the Retry-After header. As always, servers should take measures to ensure that unauthenticated requests for renewal information cannot result in denial-of-service attacks. These measures might include ensuring that a cache does not include superfluous request headers or query parameters in its cache key, instituting IP-based rate limits, or other general best-practice measures.
 
-Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, a server might place the suggested renewal window wholly in the past to encourage a client to renew immediately; but a client with a sufficiently slow clock might see the suggested window as still being in the future. Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not seed as a particular hindrance to this protocol.
+Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, a server might place the suggested renewal window wholly in the past to encourage a client to renew immediately; but a client with a sufficiently slow clock might see the suggested window as still being in the future. Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not seen as a particular hindrance to this protocol.
 
 # IANA Considerations
 
