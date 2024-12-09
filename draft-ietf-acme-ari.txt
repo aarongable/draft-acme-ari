@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                         6 December 2024
-Expires: 9 June 2025
+Intended status: Standards Track                         9 December 2024
+Expires: 12 June 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 June 2025.
+   This Internet-Draft will expire on 12 June 2025.
 
 Copyright Notice
 
@@ -313,10 +313,10 @@ Table of Contents
    After an initial fetch of a certificate's RenewalInfo, clients SHOULD
    fetch it again as soon as possible after the time indicated in the
    Retry-After header (backoff on errors takes priority, though).
-   Clients SHOULD set reasonable limits on the their checking interval.
-   For example, values under one minute could be treated as if they were
-   one minute, and values over one day could be treated as if they were
-   one day.
+   Clients SHOULD set reasonable limits on their checking interval.  For
+   example, values under one minute could be treated as if they were one
+   minute, and values over one day could be treated as if they were one
+   day.
 
 4.3.3.  Error handling
 
@@ -436,7 +436,7 @@ Table of Contents
    window as still being in the future.  Server operators should take
    this concern into account when setting suggested renewal windows.
    However, many other protocols (including TLS handshakes themselves)
-   fall apart with sufficient clock skew, so this is not seed as a
+   fall apart with sufficient clock skew, so this is not seen as a
    particular hindrance to this protocol.
 
 7.  IANA Considerations
