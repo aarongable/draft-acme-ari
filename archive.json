@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-12-08T01:41:44.500988+00:00",
+  "timestamp": "2024-12-10T01:37:33.436138+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1512,6 +1512,44 @@
           "body": "Hi, thanks for the feature request! As said above, this idea has been discussed and rejected earlier in the draft's lifecycle. I'm not opposed to the idea as a general concept, but I have yet to see a _specific_ proposal that is convincingly both efficient and simple.\r\n\r\nAt this point we're in Working Group Last Call, so a proposal for a new feature like this needs to be much more precise and fleshed out. For example:\r\n- What URL is this bulk request made to?\r\n- What set of HTTP methods (POST, GET, POST-as-GET) are acceptable, and how does their behavior differ, if at all?\r\n- What sort of constraints can be specified, and how are those included in the request?\r\n- What does the response look like? In particular, how does it associate renewal windows with individual certificates?\r\n- What happens if the number of entries in the response is too high? (In particular, if you are proposing pagination, what is the pagination or cursoring scheme?)\r\n- Can you point to a client or server implementation of this proposal?\r\n\r\nI think the simplest possible proposal for a bulk endpoint would be \"POST to the directory's `renewalInfo` endpoint with a JSON list of CertIDs; the server rejects the request if the list is too long or if any CertID doesn't belong to the requesting account, and otherwise responds with a JSON object mapping each requested CertID to its suggested renewal window\". It's not clear to me if this would satisfy the desires of large client operators.",
           "createdAt": "2024-10-17T18:39:55Z",
           "updatedAt": "2024-10-17T18:41:21Z"
+        }
+      ]
+    },
+    {
+      "number": 88,
+      "id": "I_kwDOGGBRNc6io0Cu",
+      "title": "Consider showing a decoded version of the Certificate in Appendix A",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/88",
+      "state": "OPEN",
+      "author": "jvanasco",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "A particular frustrating point I had in working on ARI is the spec's decision to utilize specific encodings in the logic example:\r\n\r\n```\r\n\r\nFor example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the request as follows:\r\n\r\n1. The `keyIdentifier` field of the certificate's AKI extension has the hexadecimal bytes `69:88:5B:6B:87:46:40:41:E1:B3:7B:84:7B:A0:AE:2C:DE:01:C8:D4` as its ASN.1 Octet String value. The base64url encoding of those bytes is `aYhba4dGQEHhs3uEe6CuLN4ByNQ=`.\r\n2. The certificate's Serial Number field has the hexadecimal bytes `00:87:65:43:21` as its DER encoding (note the leading zero byte to ensure the serial number remains positive despite the leading 1 bit in `0x87`). The base64url encoding of those bytes is `AIdlQyE=`.\r\n3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE`, and the client makes the request (split onto multiple lines for readability):\r\n```\r\n\r\nThe problem is that when using certain libraries to handle the certificates, you are likely to get different data as the entire certificate is decoded into human text components - e.g. I get `2271560481` as the serial.  This creates added complexity when constructing a library and tests, as the example may need to be encoded/decoded further.\r\n\r\nIt would be useful if Appendix A contained a brief table outlining the decoded certificate so people wouldn't have to remember they may need to decode the cert to double check the data, and can reference all the possible return values within the RFC.  Alternately, noting the decoded value of the serial (`2271560481`) in the example would be incredibly useful as well. \r\n\r\n```\r\nCertificate:\r\n    Data:\r\n        Version: 3 (0x2)\r\n        Serial Number: 2271560481 (0x87654321)\r\n        Signature Algorithm: ecdsa-with-SHA256\r\n        Issuer: CN = Example CA\r\n        Validity\r\n            Not Before: Jan  1 00:00:00 1 GMT\r\n            Not After : Jan  1 00:00:00 1 GMT\r\n        Subject: CN = example.com\r\n        Subject Public Key Info:\r\n            Public Key Algorithm: id-ecPublicKey\r\n                Public-Key: (256 bit)\r\n                pub:\r\n                    04:78:16:6e:ed:c6:e9:01:83:57:64:b6:db:87:ca:\r\n                    cd:23:3b:8e:a2:a3:8e:b6:6c:40:d6:fe:dc:46:6f:\r\n                    ff:03:0c:8c:c1:6c:72:1f:3e:33:7f:09:81:85:c4:\r\n                    ab:7f:8e:cd:50:01:5f:ab:32:d0:d8:f3:d0:c5:d4:\r\n                    d7:44:46:04:9c\r\n                ASN1 OID: prime256v1\r\n                NIST CURVE: P-256\r\n        X509v3 extensions:\r\n            X509v3 Authority Key Identifier: \r\n                69:88:5B:6B:87:46:40:41:E1:B3:7B:84:7B:A0:AE:2C:DE:01:C8:D4\r\n    Signature Algorithm: ecdsa-with-SHA256\r\n    Signature Value:\r\n        30:44:02:20:7b:4f:7e:4b:94:d9:02:5c:39:b6:0b:62:56:fb:\r\n        84:45:5e:9c:4f:89:9f:ba:d5:c8:97:04:db:f8:56:0d:ff:ca:\r\n        02:20:29:43:b2:a0:64:96:10:7d:28:07:a5:16:26:2d:f7:ee:\r\n        85:0e:3d:f3:e0:a1:95:7a:56:0c:e4:c7:6c:3b:7a:4a\r\n```",
+      "createdAt": "2024-12-10T00:19:53Z",
+      "updatedAt": "2024-12-10T00:55:37Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "I'd like to understand this request better -- I consciously chose _not_ to include a textual representation of the certificate _because_ the textual representations of the fields we care about don't line up with the underlying byte representations that are used by the URL construction. In particular, the hex representation of the serial (0x87654321) in this openssl output is actively bad, because it silently hides the leading 0x00 necessary to preserve the number's sign.\r\n\r\nI guess I don't understand the circumstances in which knowing that the cert's serial is \"2271560481\" is useful to a client developer?",
+          "createdAt": "2024-12-10T00:30:01Z",
+          "updatedAt": "2024-12-10T00:31:29Z"
+        },
+        {
+          "author": "jvanasco",
+          "authorAssociation": "NONE",
+          "body": "Use case:\r\n\r\nI have a certificate and am following the RFC to construct the ARI url.  I parse the Certificate with the tools/libraries already used by my client, and try to build a test case around the RFC example - but nothing works. After doing some debugging, downloading more tools, and looking through the various API docs and code, I realize that I am getting a textual representation of `2271560481` as the output, because just about everything fully decodes the field (possibly everything).  Had I realized that sooner, I would have saved hours, as I would have immediately seen and understood the encoding issue.\r\n\r\n",
+          "createdAt": "2024-12-10T00:46:46Z",
+          "updatedAt": "2024-12-10T00:46:46Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Sure, that flow makes sense... but I don't see how knowing _ahead of time_ that the textual representation of the serial is \"2271560481\" would have helped. The issue isn't not knowing what integer the serial decodes to, the issue is not knowing that the software is decoding the serial bytes to an integer.",
+          "createdAt": "2024-12-10T00:55:35Z",
+          "updatedAt": "2024-12-10T00:55:35Z"
         }
       ]
     }
@@ -3292,7 +3330,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-04-10T10:03:05Z",
-      "updatedAt": "2024-05-17T00:18:07Z",
+      "updatedAt": "2024-12-09T12:51:45Z",
       "baseRepository": "aarongable/draft-acme-ari",
       "baseRefName": "main",
       "baseRefOid": "4b41d813ee77ce87851745b37002dad6f1068594",
@@ -3914,6 +3952,48 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 87,
+      "id": "PR_kwDOGGBRNc6EiO9u",
+      "title": "Fix two typos",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/87",
+      "state": "MERGED",
+      "author": "robstradling",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-12-09T12:57:35Z",
+      "updatedAt": "2024-12-09T17:24:57Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "d945f26efb41c0fa3c6b29102f731c9f085edca2",
+      "headRepository": "robstradling/draft-acme-ari",
+      "headRefName": "two_typos",
+      "headRefOid": "07cb4dfd341a98727481233f4260d4398778f2ca",
+      "closedAt": "2024-12-09T17:24:56Z",
+      "mergedAt": "2024-12-09T17:24:56Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "4580324fcb43299eb85ba790801dd251d26dd76f"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGGBRNc6UYo_T",
+          "commit": {
+            "abbreviatedOid": "07cb4df"
+          },
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thank you!",
+          "createdAt": "2024-12-09T17:24:51Z",
+          "updatedAt": "2024-12-09T17:24:51Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
