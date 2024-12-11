@@ -433,11 +433,13 @@ Table of Contents
    server.  For example, if a server places the suggested renewal window
    wholly in the past to encourage a client to renew immediately, a
    client with a sufficiently slow clock might nonetheless see the
-   window as being in the future.  Server operators should take this
-   concern into account when setting suggested renewal windows.
-   However, many other protocols (including TLS handshakes themselves)
-   fall apart with sufficient clock skew, so this is not seen as a
-   particular hindrance to this protocol.
+   window as being in the future.  Similarly, a server which wishes to
+   schedule renewals very precisely may have difficulty doing so if some
+   clients have skewed clocks (or do no implement ARI at all).  Server
+   operators should take this concern into account when setting
+   suggested renewal windows.  However, many other protocols (including
+   TLS handshakes themselves) fall apart with sufficient clock skew, so
+   this is not seen as a particular hindrance to this protocol.
 
 7.  IANA Considerations
 
