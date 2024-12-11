@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                        25 November 2024
-Expires: 29 May 2025
+Intended status: Standards Track                        11 December 2024
+Expires: 14 June 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 May 2025.
+   This Internet-Draft will expire on 14 June 2025.
 
 Copyright Notice
 
@@ -99,27 +99,27 @@ Table of Contents
 
    Most ACME [RFC8555] clients today choose when to attempt to renew a
    certificate in one of three ways.  They may be configured to renew at
-   a specific interval (e.g. via cron); they may parse the issued
+   a specific interval (e.g., via cron), they may parse the issued
    certificate to determine its expiration date and renew a specific
-   amount of time before then; or they may parse the issued certificate
+   amount of time before then, or they may parse the issued certificate
    and renew when some percentage of its validity period has passed.
    The first two techniques create significant barriers against the
    issuing Certification Authority (CA) changing certificate lifetimes.
-   All three techniques lead to load clustering for the issuing CA.
+   All three techniques may lead to load clustering for the issuing CA
+   due to the inability of the issuing CA to schedule renewal requests.
 
    Allowing issuing CAs to suggest a period in which clients should
-   renew their certificates enables for dynamic time-based load
-   balancing.  This allows a CA to better respond to exceptional
-   circumstances.  For example, a CA could suggest that clients renew
-   prior to a mass-revocation event to mitigate the impact of the
-   revocation, or a CA could suggest that clients renew earlier than
-   they normally would to reduce the size of an upcoming mass-renewal
-   spike.
+   renew their certificates enables dynamic time-based load balancing.
+   This allows a CA to better respond to exceptional circumstances.  For
+   example, a CA could suggest that clients renew prior to a mass-
+   revocation event to mitigate the impact of the revocation, or a CA
+   could suggest that clients renew earlier than they normally would to
+   reduce the size of an upcoming mass-renewal spike.
 
    This document specifies ACME Renewal Information (ARI), a mechanism
    by which ACME servers may provide suggested renewal windows to ACME
-   clients, and by which ACME clients may inform ACME servers that a
-   certificate has been renewed and replaced.
+   clients, and by which ACME clients may inform ACME servers that they
+   have successfully renewed and replaced a certificate.
 
 2.  Conventions and Definitions
 
@@ -174,9 +174,9 @@ Table of Contents
 
 4.1.  The "renewalInfo" Resource
 
-   The "renewalInfo" resource is a new resource type introduced to ACME
-   protocol.  This new resource allows clients to query the server for
-   suggestions on when they should renew certificates.
+   The "renewalInfo" resource is a new resource type introduced to the
+   ACME protocol.  This new resource allows clients to query the server
+   for suggestions on when they should renew certificates.
 
    To request the suggested renewal information for a certificate, the
    client sends a GET request to a path under the server's renewalInfo
@@ -184,12 +184,11 @@ Table of Contents
 
    The path component is a unique identifier for the certificate in
    question.  The unique identifier is constructed by concatenating the
-   base64url-encoding [RFC4648] of the bytes of the keyIdentifier field
-   of certificate's Authority Key Identifier (AKI) [RFC5280] extension,
-   a literal period, and the base64url-encoding of the bytes of the DER
-   encoding of the certificate's Serial Number (without the tag and
-   length bytes).  All trailing "=" characters MUST be stripped from
-   both parts of the unique identifier.
+   base64url-encoding [RFC4648] of the keyIdentifier field of the
+   certificate's Authority Key Identifier (AKI) [RFC5280] extension, a
+   literal period, and the base64url-encoding of the DER-encoded Serial
+   Number field (without the tag and length bytes).  All trailing "="
+   characters MUST be stripped from both parts of the unique identifier.
 
    Thus the full request url is constructed as follows (split onto
    multiple lines for readability), where the "||" operator indicates
@@ -230,10 +229,10 @@ Table of Contents
    CA recommends renewing the certificate.
 
    explanationURL (string, optional): A URL pointing to a page which may
-   explain why the suggested renewal window is what it is.  For example,
-   it may be a page explaining the CA's dynamic load-balancing strategy,
-   or a page documenting which certificates are affected by a mass
-   revocation event.  Conforming clients SHOULD provide this URL to
+   explain why the suggested renewal window has its current value.  For
+   example, it may be a page explaining the CA's dynamic load-balancing
+   strategy, or a page documenting which certificates are affected by a
+   mass revocation event.  Conforming clients SHOULD provide this URL to
    their operator, if present.
 
    HTTP/1.1 200 OK
@@ -259,8 +258,8 @@ Table of Contents
        at exactly the selected time, do so.
    5.  Otherwise, if the selected time is before the next time that the
        client would wake up normally, attempt renewal immediately.
-   6.  Otherwise, sleep until the Retry-After period has passed, or
-       until the next normal wake time, and return to Step 1.
+   6.  Otherwise, sleep until the time indicated by the Retry-After
+       header and return to Step 1.
 
    In all cases, renewal attempts are subject to the client's existing
    error backoff and retry intervals.
@@ -276,7 +275,7 @@ Table of Contents
    A RenewalInfo object in which the end timestamp equals or precedes
    the start timestamp is invalid.  Servers MUST NOT serve such a
    response, and clients MUST treat one as though they failed to receive
-   any response from the server (e.g. retry at an appropriate interval,
+   any response from the server (e.g., retry at an appropriate interval,
    renew on a fallback schedule, etc.).
 
 4.3.  Schedule for checking the RenewalInfo resource
@@ -314,10 +313,10 @@ Table of Contents
    After an initial fetch of a certificate's RenewalInfo, clients SHOULD
    fetch it again as soon as possible after the time indicated in the
    Retry-After header (backoff on errors takes priority, though).
-   Clients SHOULD set reasonable limits on the their checking interval.
-   For example, values under one minute could be treated as if they were
-   one minute, and values over one day could be treated as if they were
-   one day.
+   Clients SHOULD set reasonable limits on their checking interval.  For
+   example, values under one minute could be treated as if they were one
+   minute, and values over one day could be treated as if they were one
+   day.
 
 4.3.3.  Error handling
 
@@ -411,7 +410,7 @@ Table of Contents
 
 6.  Security Considerations
 
-   The extensions to the ACME protocol described in this document build
+   The extensions to the ACME protocol described in this document builds
    upon the Security Considerations and threat model defined in
    [RFC8555], Section 10.1.
 
@@ -421,8 +420,26 @@ Table of Contents
    fetch resources from the server.  This is because the information
    contained in renewalInfo resources is not considered confidential,
    and because allowing renewalInfo to be easily cached is advantageous
-   to shed load from clients which do not respect the Retry-After
-   header.
+   to shed the load from clients which do not respect the Retry-After
+   header.  As always, servers should take measures to ensure that
+   unauthenticated requests for renewal information cannot result in
+   denial-of-service attacks.  These measures might include ensuring
+   that a cache does not include superfluous request headers or query
+   parameters in its cache key, instituting IP-based rate limits, or
+   other general best-practice measures.
+
+   Note that this protocol could exhibit undesired behavior in the
+   presence of significant clock skew between the ACME client and
+   server.  For example, if a server places the suggested renewal window
+   wholly in the past to encourage a client to renew immediately, a
+   client with a sufficiently slow clock might nonetheless see the
+   window as being in the future.  Similarly, a server which wishes to
+   schedule renewals very precisely may have difficulty doing so if some
+   clients have skewed clocks (or do no implement ARI at all).  Server
+   operators should take this concern into account when setting
+   suggested renewal windows.  However, many other protocols (including
+   TLS handshakes themselves) fall apart with sufficient clock skew, so
+   this is not seen as a particular hindrance to this protocol.
 
 7.  IANA Considerations
 
