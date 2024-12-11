@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                         9 December 2024
-Expires: 12 June 2025
+Intended status: Standards Track                        11 December 2024
+Expires: 14 June 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 June 2025.
+   This Internet-Draft will expire on 14 June 2025.
 
 Copyright Notice
 
@@ -99,9 +99,9 @@ Table of Contents
 
    Most ACME [RFC8555] clients today choose when to attempt to renew a
    certificate in one of three ways.  They may be configured to renew at
-   a specific interval (e.g., via cron); they may parse the issued
+   a specific interval (e.g., via cron), they may parse the issued
    certificate to determine its expiration date and renew a specific
-   amount of time before then; or they may parse the issued certificate
+   amount of time before then, or they may parse the issued certificate
    and renew when some percentage of its validity period has passed.
    The first two techniques create significant barriers against the
    issuing Certification Authority (CA) changing certificate lifetimes.
@@ -430,11 +430,11 @@ Table of Contents
 
    Note that this protocol could exhibit undesired behavior in the
    presence of significant clock skew between the ACME client and
-   server.  For example, a server might place the suggested renewal
-   window wholly in the past to encourage a client to renew immediately;
-   but a client with a sufficiently slow clock might see the suggested
-   window as still being in the future.  Server operators should take
-   this concern into account when setting suggested renewal windows.
+   server.  For example, if a server places the suggested renewal window
+   wholly in the past to encourage a client to renew immediately, a
+   client with a sufficiently slow clock might nonetheless see the
+   window as being in the future.  Server operators should take this
+   concern into account when setting suggested renewal windows.
    However, many other protocols (including TLS handshakes themselves)
    fall apart with sufficient clock skew, so this is not seen as a
    particular hindrance to this protocol.
