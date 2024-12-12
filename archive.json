@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-12-10T01:37:33.436138+00:00",
+  "timestamp": "2024-12-12T01:27:47.498767+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1527,7 +1527,7 @@
       "labels": [],
       "body": "A particular frustrating point I had in working on ARI is the spec's decision to utilize specific encodings in the logic example:\r\n\r\n```\r\n\r\nFor example, to request renewal information for the end-entity certificate given in Appendix A, the client would make the request as follows:\r\n\r\n1. The `keyIdentifier` field of the certificate's AKI extension has the hexadecimal bytes `69:88:5B:6B:87:46:40:41:E1:B3:7B:84:7B:A0:AE:2C:DE:01:C8:D4` as its ASN.1 Octet String value. The base64url encoding of those bytes is `aYhba4dGQEHhs3uEe6CuLN4ByNQ=`.\r\n2. The certificate's Serial Number field has the hexadecimal bytes `00:87:65:43:21` as its DER encoding (note the leading zero byte to ensure the serial number remains positive despite the leading 1 bit in `0x87`). The base64url encoding of those bytes is `AIdlQyE=`.\r\n3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE`, and the client makes the request (split onto multiple lines for readability):\r\n```\r\n\r\nThe problem is that when using certain libraries to handle the certificates, you are likely to get different data as the entire certificate is decoded into human text components - e.g. I get `2271560481` as the serial.  This creates added complexity when constructing a library and tests, as the example may need to be encoded/decoded further.\r\n\r\nIt would be useful if Appendix A contained a brief table outlining the decoded certificate so people wouldn't have to remember they may need to decode the cert to double check the data, and can reference all the possible return values within the RFC.  Alternately, noting the decoded value of the serial (`2271560481`) in the example would be incredibly useful as well. \r\n\r\n```\r\nCertificate:\r\n    Data:\r\n        Version: 3 (0x2)\r\n        Serial Number: 2271560481 (0x87654321)\r\n        Signature Algorithm: ecdsa-with-SHA256\r\n        Issuer: CN = Example CA\r\n        Validity\r\n            Not Before: Jan  1 00:00:00 1 GMT\r\n            Not After : Jan  1 00:00:00 1 GMT\r\n        Subject: CN = example.com\r\n        Subject Public Key Info:\r\n            Public Key Algorithm: id-ecPublicKey\r\n                Public-Key: (256 bit)\r\n                pub:\r\n                    04:78:16:6e:ed:c6:e9:01:83:57:64:b6:db:87:ca:\r\n                    cd:23:3b:8e:a2:a3:8e:b6:6c:40:d6:fe:dc:46:6f:\r\n                    ff:03:0c:8c:c1:6c:72:1f:3e:33:7f:09:81:85:c4:\r\n                    ab:7f:8e:cd:50:01:5f:ab:32:d0:d8:f3:d0:c5:d4:\r\n                    d7:44:46:04:9c\r\n                ASN1 OID: prime256v1\r\n                NIST CURVE: P-256\r\n        X509v3 extensions:\r\n            X509v3 Authority Key Identifier: \r\n                69:88:5B:6B:87:46:40:41:E1:B3:7B:84:7B:A0:AE:2C:DE:01:C8:D4\r\n    Signature Algorithm: ecdsa-with-SHA256\r\n    Signature Value:\r\n        30:44:02:20:7b:4f:7e:4b:94:d9:02:5c:39:b6:0b:62:56:fb:\r\n        84:45:5e:9c:4f:89:9f:ba:d5:c8:97:04:db:f8:56:0d:ff:ca:\r\n        02:20:29:43:b2:a0:64:96:10:7d:28:07:a5:16:26:2d:f7:ee:\r\n        85:0e:3d:f3:e0:a1:95:7a:56:0c:e4:c7:6c:3b:7a:4a\r\n```",
       "createdAt": "2024-12-10T00:19:53Z",
-      "updatedAt": "2024-12-10T00:55:37Z",
+      "updatedAt": "2024-12-11T08:46:52Z",
       "closedAt": null,
       "comments": [
         {
@@ -1550,6 +1550,20 @@
           "body": "Sure, that flow makes sense... but I don't see how knowing _ahead of time_ that the textual representation of the serial is \"2271560481\" would have helped. The issue isn't not knowing what integer the serial decodes to, the issue is not knowing that the software is decoding the serial bytes to an integer.",
           "createdAt": "2024-12-10T00:55:35Z",
           "updatedAt": "2024-12-10T00:55:35Z"
+        },
+        {
+          "author": "jvanasco",
+          "authorAssociation": "NONE",
+          "body": "> the issue is not knowing that the software is decoding the serial bytes to an integer\r\n\r\nYes.  Knowing the underlying libraries *might* decode the serial bytes to an integer would have been 95% useful here, knowing the exact integer just makes things more obvious.\r\n\r\nWhen it comes to the AKID, the underlying libraries in Python also all have some weird behaviors; they seem to fully decode the serial but still leave the tag on - so you have to discard the first 4 bytes of the value.  That drove me batty for a bit.  `orangepizza` had figured that out in their [Certbot PR](https://github.com/certbot/certbot/pull/9945/files#diff-035393341b36c4adff76feb0627156920de618857c156c42335ef9b0437de6fe) \r\n\r\n\r\n\r\n\r\n\r\n",
+          "createdAt": "2024-12-11T02:54:04Z",
+          "updatedAt": "2024-12-11T02:54:04Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "> When it comes to the AKID, the underlying libraries in Python also all have some weird behaviors; they seem to fully decode the serial but still leave the tag on - so you have to discard the first 4 bytes of the value.\r\n\r\nThat's not a weird behavior, that's the library doing the right thing. It's returning [the whole authorityKeyIdentifier extension](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.1). ARI wants the keyIdentifier _field of_ that extension. The proper thing to do would be to parse those bytes as ASN.1 and access the field with tag 0. Simply discarding the first four bytes is likely to work most of the time in practice, but is by no means guaranteed.",
+          "createdAt": "2024-12-11T08:46:51Z",
+          "updatedAt": "2024-12-11T08:46:51Z"
         }
       ]
     }
@@ -3994,6 +4008,62 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 89,
+      "id": "PR_kwDOGGBRNc6Ex-SM",
+      "title": "Improvements from GENART feedback",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/89",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-12-11T00:12:35Z",
+      "updatedAt": "2024-12-11T00:20:46Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "4580324fcb43299eb85ba790801dd251d26dd76f",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "genart-review",
+      "headRefOid": "306f5915f1486406d2a6358f25e03ca26750528d",
+      "closedAt": "2024-12-11T00:20:45Z",
+      "mergedAt": "2024-12-11T00:20:45Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "e7a5fa144453ab6ae856ef1c16eb20b7d8d83aa6"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 90,
+      "id": "PR_kwDOGGBRNc6EyJ6X",
+      "title": "Additional DNSDIR feedback",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/90",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-12-11T00:59:19Z",
+      "updatedAt": "2024-12-11T01:00:42Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "e7a5fa144453ab6ae856ef1c16eb20b7d8d83aa6",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "aarongable-patch-1",
+      "headRefOid": "f6feede356a530470c705abd38921de52371e440",
+      "closedAt": "2024-12-11T01:00:41Z",
+      "mergedAt": "2024-12-11T01:00:41Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "21245a413d9e7a08c57f20c34ab850b0671d893c"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
