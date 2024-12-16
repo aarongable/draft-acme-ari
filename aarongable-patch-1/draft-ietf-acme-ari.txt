@@ -4,8 +4,8 @@
 
 ACME Working Group                                              A. Gable
 Internet-Draft                          Internet Security Research Group
-Intended status: Standards Track                        11 December 2024
-Expires: 14 June 2025
+Intended status: Standards Track                        16 December 2024
+Expires: 19 June 2025
 
 
 Automated Certificate Management Environment (ACME) Renewal Information
@@ -53,7 +53,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 June 2025.
+   This Internet-Draft will expire on 19 June 2025.
 
 Copyright Notice
 
@@ -324,7 +324,7 @@ Table of Contents
 
    *  Connection timeout
    *  Request timeout
-   *  5xx HTTP errors.
+   *  5xx HTTP errors
 
    On receiving a temporary error, clients SHOULD do exponential backoff
    with a capped number of tries.  If all tries are exhausted, clients
@@ -439,7 +439,7 @@ Table of Contents
    operators should take this concern into account when setting
    suggested renewal windows.  However, many other protocols (including
    TLS handshakes themselves) fall apart with sufficient clock skew, so
-   this is not seen as a particular hindrance to this protocol.
+   this is not unique to this protocol.
 
 7.  IANA Considerations
 
