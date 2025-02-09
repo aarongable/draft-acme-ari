@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-06T01:20:41.860115+00:00",
+  "timestamp": "2025-02-09T01:24:21.951979+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1566,6 +1566,22 @@
           "updatedAt": "2024-12-11T08:46:51Z"
         }
       ]
+    },
+    {
+      "number": 92,
+      "id": "I_kwDOGGBRNc6pEc7Q",
+      "title": "include a server-side Order object response",
+      "url": "https://github.com/aarongable/draft-acme-ari/issues/92",
+      "state": "OPEN",
+      "author": "jvanasco",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft shows an example POSTed order object, in which the `profile` field appears in the Client submission.\n\nThe draft does not show an example response order object, generated on the server, which includes the `profile` field.\n\nIMHO that would be useful to illustrate that either:\n\n1- the requested profile was honored, and persists\n2- no profile was submitted, but the server assigned it",
+      "createdAt": "2025-02-06T20:28:19Z",
+      "updatedAt": "2025-02-06T20:28:19Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
