@@ -1383,7 +1383,7 @@ Retry-After: 21600
           <h4 id="name-client-handling-of-retry-af">
 <a href="#section-4.3.2" class="section-number selfRef">4.3.2. </a><a href="#name-client-handling-of-retry-af" class="section-name selfRef">Client handling of Retry-After</a>
           </h4>
-<p id="section-4.3.2-1">After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.<a href="#section-4.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.3.2-1">After an initial fetch of a certificate's RenewalInfo, clients MUST fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients MUST set reasonable limits on their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.<a href="#section-4.3.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="error-handling">
@@ -1400,7 +1400,7 @@ Retry-After: 21600
             <li class="compact" id="section-4.3.3-2.3">5xx HTTP errors<a href="#section-4.3.3-2.3" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.3-3">On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients SHOULD treat the request as a long-term error.<a href="#section-4.3.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3.3-3">On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients MUST treat the request as a long-term error.<a href="#section-4.3.3-3" class="pilcrow">¶</a></p>
 <p id="section-4.3.3-4">Long term errors include, for instance:<a href="#section-4.3.3-4" class="pilcrow">¶</a></p>
 <ul class="compact">
 <li class="compact" id="section-4.3.3-5.1">Retry-After is invalid or not present<a href="#section-4.3.3-5.1" class="pilcrow">¶</a>
@@ -1414,7 +1414,7 @@ Retry-After: 21600
             <li class="compact" id="section-4.3.3-5.5">Non-5xx HTTP error<a href="#section-4.3.3-5.5" class="pilcrow">¶</a>
 </li>
           </ul>
-<p id="section-4.3.3-6">On receiving a long term error, clients SHOULD perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).<a href="#section-4.3.3-6" class="pilcrow">¶</a></p>
+<p id="section-4.3.3-6">On receiving a long term error, clients MUST perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).<a href="#section-4.3.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1512,7 +1512,7 @@ Content-Type: application/jose+json
         </h3>
 <p id="section-7.2-1">IANA will add the following new registry to the "Automated Certificate Management Environment (ACME) Protocol" registry group at <a href="https://www.iana.org/assignments/acme">https://www.iana.org/assignments/acme</a>:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <p id="section-7.2-2">Registry Name: ACME Renewal Info Object Fields<a href="#section-7.2-2" class="pilcrow">¶</a></p>
-<p id="section-7.2-3">Registration Procedure: Specification Required<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">Registration Procedure: Specification Required. The designated expert should ensure that any new fields added to this registry carry useful and unique information that does not better belong elsewhere in the ACME protocol.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <p id="section-7.2-4">Template:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
 <ul class="compact">
 <li class="compact" id="section-7.2-5.1">Field name: The string to be used as a field name in the JSON object<a href="#section-7.2-5.1" class="pilcrow">¶</a>
