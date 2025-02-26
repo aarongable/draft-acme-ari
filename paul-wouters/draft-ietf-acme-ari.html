@@ -9,20 +9,20 @@
 <meta content="
        This document specifies how an ACME server may provide suggestions to ACME clients as to when they should attempt to renew their certificates. This allows servers to mitigate load spikes, and ensures clients do not make false assumptions about appropriate certificate renewal periods. 
     " name="description">
-<meta content="xml2rfc 3.25.0" name="generator">
+<meta content="xml2rfc 3.27.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-acme-ari-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.25.0
-    Python 3.12.7
+  xml2rfc 3.27.0
+    Python 3.12.9
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
-    Jinja2 3.1.4
+    Jinja2 3.1.5
     lxml 5.3.0
     platformdirs 4.3.6
-    pycountry 22.3.5
-    PyYAML 6.0.1
+    pycountry 24.6.1
+    PyYAML 6.0.2
     requests 2.32.3
     setuptools 70.3.0
     wcwidth 0.2.13
@@ -435,7 +435,7 @@ dl {
     margin-bottom: 0;
   }
 }
-dl > dt {
+dl:not(.dlNewline) > dt {
   float: left;
   margin-right: 2ch;
   min-width: 8ch;
@@ -534,7 +534,11 @@ figcaption, caption {
   }
   pre, svg {
     display: inline-block;
-    overflow-x: auto;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
   }
   pre {
     max-width: 100%;
@@ -1040,11 +1044,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">ACME ARI</td>
-<td class="right">December 2024</td>
+<td class="right">February 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Gable</td>
-<td class="center">Expires 9 June 2025</td>
+<td class="center">Expires 30 August 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1061,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-acme-ari-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-06" class="published">6 December 2024</time>
+<time datetime="2025-02-26" class="published">26 February 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-09">9 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-08-30">30 August 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1103,7 +1107,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 30 August 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1112,7 +1116,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2024 IETF Trust and the persons identified as the
+            Copyright (c) 2025 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1218,7 +1222,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Most ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g., via <code>cron</code>); they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then; or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing Certification Authority (CA) changing certificate lifetimes. All three techniques may lead to load clustering for the issuing CA due to the inability of the issuing CA to schedule renewal requests.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">Most ACME <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> clients today choose when to attempt to renew a certificate in one of three ways. They may be configured to renew at a specific interval (e.g., via <code>cron</code>), they may parse the issued certificate to determine its expiration date and renew a specific amount of time before then, or they may parse the issued certificate and renew when some percentage of its validity period has passed. The first two techniques create significant barriers against the issuing Certification Authority (CA) changing certificate lifetimes. All three techniques may lead to load clustering for the issuing CA due to the inability of the issuing CA to schedule renewal requests.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">Allowing issuing CAs to suggest a period in which clients should renew their certificates enables dynamic time-based load balancing. This allows a CA to better respond to exceptional circumstances. For example, a CA could suggest that clients renew prior to a mass-revocation event to mitigate the impact of the revocation, or a CA could suggest that clients renew earlier than they normally would to reduce the size of an upcoming mass-renewal spike.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document specifies ACME Renewal Information (ARI), a mechanism by which ACME servers may provide suggested renewal windows to ACME clients, and by which ACME clients may inform ACME servers that they have successfully renewed and replaced a certificate.<a href="#section-1-3" class="pilcrow">¶</a></p>
 </section>
@@ -1259,16 +1263,16 @@ svg :is([fill="white"], [fill^="#fff"]) {
 Content-Type: application/json
 
 {
-  "newNonce": "https://example.com/acme/new-nonce",
-  "newAccount": "https://example.com/acme/new-account",
-  "newOrder": "https://example.com/acme/new-order",
-  "newAuthz": "https://example.com/acme/new-authz",
-  "revokeCert": "https://example.com/acme/revoke-cert",
-  "keyChange": "https://example.com/acme/key-change",
-  "renewalInfo": "https://example.com/acme/renewal-info",
+  "newNonce": "https://acme.example.com/new-nonce",
+  "newAccount": "https://acme.example.com/new-account",
+  "newOrder": "https://acme.example.com/new-order",
+  "newAuthz": "https://acme.example.com/new-authz",
+  "revokeCert": "https://acme.example.com/revoke-cert",
+  "keyChange": "https://acme.example.com/key-change",
+  "renewalInfo": "https://acme.example.com/renewal-info",
   "meta": {
-    "termsOfService": "https://example.com/acme/terms/2021-10-05",
-    "website": "https://www.example.com/",
+    "termsOfService": "https://example.com/acme/terms",
+    "website": "https://example.com/acme/docs",
     "caaIdentities": ["example.com"],
     "externalAccountRequired": false
   }
@@ -1289,7 +1293,7 @@ Content-Type: application/json
 <a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-the-renewalinfo-resource" class="section-name selfRef">The "renewalInfo" Resource</a>
         </h3>
 <p id="section-4.1-1">The "<code>renewalInfo</code>" resource is a new resource type introduced to the ACME protocol. This new resource allows clients to query the server for suggestions on when they should renew certificates.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's <code>renewalInfo</code> URL.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">To request the suggested renewal information for a certificate, the client sends an unauthenticated GET request to a path under the server's <code>renewalInfo</code> URL.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
 <p id="section-4.1-3">The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding <span>[<a href="#RFC4648" class="cite xref">RFC4648</a>]</span> of the <code>keyIdentifier</code> field of the certificate's Authority Key Identifier (AKI) <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span> extension, a literal period, and the base64url-encoding of the DER-encoded Serial Number field (without the tag and length bytes). All trailing "<code>=</code>" characters MUST be stripped from both parts of the unique identifier.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 <p id="section-4.1-4">Thus the full request url is constructed as follows (split onto multiple lines for readability), where the "<code>||</code>" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-4.1-5">
@@ -1308,7 +1312,7 @@ Content-Type: application/json
 </li>
         </ol>
 <div class="lang-text sourcecode" id="section-4.1-8">
-<pre>GET https://example.com/acme/renewal-info/
+<pre>GET https://acme.example.com/renewal-info/
       aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
 
 </pre><a href="#section-4.1-8" class="pilcrow">¶</a>
@@ -1322,7 +1326,7 @@ Content-Type: application/json
         </h3>
 <p id="section-4.2-1">The structure of an ACME <code>renewalInfo</code> resource is as follows:<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2"><code>suggestedWindow</code> (object, required): A JSON object with two keys, "<code>start</code>" and "<code>end</code>", whose values are timestamps, encoded in the format specified in <span>[<a href="#RFC3339" class="cite xref">RFC3339</a>]</span>, which bound the window of time in which the CA recommends renewing the certificate.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3"><code>explanationURL</code> (string, optional): A URL pointing to a page which may explain why the suggested renewal window has its current value. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Conforming clients <span class="bcp14">SHOULD</span> provide this URL to their operator, if present.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-3"><code>explanationURL</code> (string, optional): A URL pointing to a page which may explain why the suggested renewal window has its current value. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Clients <span class="bcp14">SHOULD</span> provide this URL to their operator, if present.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
 <div class="lang-json sourcecode" id="section-4.2-4">
 <pre>HTTP/1.1 200 OK
 Content-Type: application/json
@@ -1333,12 +1337,12 @@ Retry-After: 21600
     "start": "2021-01-03T00:00:00Z",
     "end": "2021-01-07T00:00:00Z"
   },
-  "explanationURL": "https://example.com/docs/ari"
+  "explanationURL": "https://acme.example.com/docs/ari"
 }
 
 </pre><a href="#section-4.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-4.2-5">Conforming clients <span class="bcp14">MUST</span> attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is <span class="bcp14">RECOMMENDED</span> for choosing a renewal time:<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+<p id="section-4.2-5">Clients <span class="bcp14">MUST</span> attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is <span class="bcp14">RECOMMENDED</span> for choosing a renewal time:<a href="#section-4.2-5" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="compact type-1" id="section-4.2-6">
 <li id="section-4.2-6.1">Query the <code>renewalInfo</code> resource to get a suggested renewal window.<a href="#section-4.2-6.1" class="pilcrow">¶</a>
 </li>
@@ -1350,7 +1354,7 @@ Retry-After: 21600
 </li>
           <li id="section-4.2-6.5">Otherwise, if the selected time is before the next time that the client would wake up normally, attempt renewal immediately.<a href="#section-4.2-6.5" class="pilcrow">¶</a>
 </li>
-          <li id="section-4.2-6.6">Otherwise, sleep until the <code>Retry-After</code> period has passed, or until the next normal wake time, and return to Step 1.<a href="#section-4.2-6.6" class="pilcrow">¶</a>
+          <li id="section-4.2-6.6">Otherwise, sleep until the time indicated by the <code>Retry-After</code> header and return to Step 1.<a href="#section-4.2-6.6" class="pilcrow">¶</a>
 </li>
         </ol>
 <p id="section-4.2-7">In all cases, renewal attempts are subject to the client's existing error backoff and retry intervals.<a href="#section-4.2-7" class="pilcrow">¶</a></p>
@@ -1363,8 +1367,9 @@ Retry-After: 21600
         <h3 id="name-schedule-for-checking-the-r">
 <a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-schedule-for-checking-the-r" class="section-name selfRef">Schedule for checking the RenewalInfo resource</a>
         </h3>
-<p id="section-4.3-1">Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance. Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">During the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-1">Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">During the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header <span>[<a href="#RFC9110" class="cite xref">RFC9110</a>]</span> to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the minimum time to wait before retrying a request. In this protocol, it indicates the desired (i.e. both requested minimum and maximum) amount of time to wait.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">Clients MUST NOT check a certificate's RenewalInfo after the certificate has expired. Clients MUST NOT check a certificate's RenewalInfo after they consider the certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).<a href="#section-4.3-3" class="pilcrow">¶</a></p>
 <div id="server-choice-of-retry-after">
 <section id="section-4.3.1">
           <h4 id="name-server-choice-of-retry-afte">
@@ -1378,7 +1383,7 @@ Retry-After: 21600
           <h4 id="name-client-handling-of-retry-af">
 <a href="#section-4.3.2" class="section-number selfRef">4.3.2. </a><a href="#name-client-handling-of-retry-af" class="section-name selfRef">Client handling of Retry-After</a>
           </h4>
-<p id="section-4.3.2-1">After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on the their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.<a href="#section-4.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.3.2-1">After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.<a href="#section-4.3.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="error-handling">
@@ -1392,7 +1397,7 @@ Retry-After: 21600
 </li>
             <li class="compact" id="section-4.3.3-2.2">Request timeout<a href="#section-4.3.3-2.2" class="pilcrow">¶</a>
 </li>
-            <li class="compact" id="section-4.3.3-2.3">5xx HTTP errors.<a href="#section-4.3.3-2.3" class="pilcrow">¶</a>
+            <li class="compact" id="section-4.3.3-2.3">5xx HTTP errors<a href="#section-4.3.3-2.3" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-4.3.3-3">On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients SHOULD treat the request as a long-term error.<a href="#section-4.3.3-3" class="pilcrow">¶</a></p>
@@ -1425,20 +1430,20 @@ Retry-After: 21600
 <p id="section-5-2"><code>replaces</code> (string, optional): A string uniquely identifying a previously-issued certificate which this order is intended to replace. This unique identifier is constructed in the same way as the path component for GET requests described above.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <p id="section-5-3">Clients <span class="bcp14">SHOULD</span> include this field in New Order requests if there is a clear predecessor certificate, as is the case for most certificate renewals. Clients <span class="bcp14">SHOULD NOT</span> include this field if the ACME Server has not indicated that it supports this protocol by advertising the <code>renewalInfo</code> resource in its Directory.<a href="#section-5-3" class="pilcrow">¶</a></p>
 <div class="lang-text sourcecode" id="section-5-4">
-<pre>POST /acme/new-order HTTP/1.1
-Host: example.com
+<pre>POST /new-order HTTP/1.1
+Host: acme.example.com
 Content-Type: application/jose+json
 
 {
   "protected": base64url({
     "alg": "ES256",
-    "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+    "kid": "https://acme.example.com/acct/evOfKhNU60wg",
     "nonce": "5XJ1L3lEkMG7tR6pA00clA",
-    "url": "https://example.com/acme/new-order"
+    "url": "https://acme.example.com/new-order"
   }),
   "payload": base64url({
     "identifiers": [
-      { "type": "dns", "value": "example.com" }
+      { "type": "dns", "value": "acme.example.com" }
     ],
     "replaces": "aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE"
   }),
@@ -1466,8 +1471,8 @@ Content-Type: application/jose+json
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <p id="section-6-1">The extensions to the ACME protocol described in this document builds upon the Security Considerations and threat model defined in <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>, Section 10.1.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">This document specifies that <code>renewalInfo</code> resources <span class="bcp14">MUST</span> be exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in <code>renewalInfo</code> resources is not considered confidential, and because allowing <code>renewalInfo</code> to be easily cached is advantageous to shed the load from clients which do not respect the Retry-After header. As always, servers should take measures to ensure that unauthenticated requests for renewal information cannot result in denial-of-service attacks. These measures might include ensuring that a cache does not include superfluous request headers or query parameters in its cache key, instituting IP-based rate limits, or other general best-practice measures.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, a server might place the suggested renewal window wholly in the past to encourage a client to renew immediately; but a client with a sufficiently slow clock might see the suggested window as still being in the future. Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not seed as a particular hindrance to this protocol.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-2">This document specifies that <code>renewalInfo</code> resources are exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients send POST-as-GET requests to fetch resources from the server. This is because the information contained in <code>renewalInfo</code> resources is not considered confidential, and because allowing <code>renewalInfo</code> to be easily cached is advantageous to shed the load from clients which do not respect the Retry-After header. As always, servers should take measures to ensure that unauthenticated requests for renewal information cannot result in denial-of-service attacks. These measures might include ensuring that a cache does not include superfluous request headers or query parameters in its cache key, instituting IP-based rate limits, or other general best-practice measures.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, if a server places the suggested renewal window wholly in the past to encourage a client to renew immediately, a client with a sufficiently slow clock might nonetheless see the window as being in the future. Similarly, a server which wishes to schedule renewals very precisely may have difficulty doing so if some clients have skewed clocks (or do no implement ARI at all). Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not unique to this protocol.<a href="#section-6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
