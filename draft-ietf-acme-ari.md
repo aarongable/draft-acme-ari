@@ -157,7 +157,7 @@ Servers set the Retry-After header based on their requirements on how quickly to
 
 ### Client handling of Retry-After
 
-After an initial fetch of a certificate's RenewalInfo, clients SHOULD fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients SHOULD set reasonable limits on their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
+After an initial fetch of a certificate's RenewalInfo, clients MUST fetch it again as soon as possible after the time indicated in the Retry-After header (backoff on errors takes priority, though). Clients MUST set reasonable limits on their checking interval. For example, values under one minute could be treated as if they were one minute, and values over one day could be treated as if they were one day.
 
 ### Error handling
 
@@ -167,7 +167,7 @@ Temporary errors include, for instance:
 - Request timeout
 - 5xx HTTP errors
 
-On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients SHOULD treat the request as a long-term error.
+On receiving a temporary error, clients SHOULD do exponential backoff with a capped number of tries. If all tries are exhausted, clients MUST treat the request as a long-term error.
 
 Long term errors include, for instance:
 
@@ -177,7 +177,7 @@ Long term errors include, for instance:
 - Connection refused
 - Non-5xx HTTP error
 
-On receiving a long term error, clients SHOULD perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).
+On receiving a long term error, clients MUST perform the next RenewalInfo fetch as soon as possible after six hours have passed (or some other locally configured default).
 
 # Extensions to the Order Object
 
@@ -243,7 +243,7 @@ IANA will add the following new registry to the "Automated Certificate Managemen
 
 Registry Name: ACME Renewal Info Object Fields
 
-Registration Procedure: Specification Required
+Registration Procedure: Specification Required. The designated expert should ensure that any new fields added to this registry carry useful and unique information that does not better belong elsewhere in the ACME protocol.
 
 Template:
 
