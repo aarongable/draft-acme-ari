@@ -62,16 +62,16 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "newNonce": "https://example.com/acme/new-nonce",
-  "newAccount": "https://example.com/acme/new-account",
-  "newOrder": "https://example.com/acme/new-order",
-  "newAuthz": "https://example.com/acme/new-authz",
-  "revokeCert": "https://example.com/acme/revoke-cert",
-  "keyChange": "https://example.com/acme/key-change",
-  "renewalInfo": "https://example.com/acme/renewal-info",
+  "newNonce": "https://acme.example.com/new-nonce",
+  "newAccount": "https://acme.example.com/new-account",
+  "newOrder": "https://acme.example.com/new-order",
+  "newAuthz": "https://acme.example.com/new-authz",
+  "revokeCert": "https://acme.example.com/revoke-cert",
+  "keyChange": "https://acme.example.com/key-change",
+  "renewalInfo": "https://acme.example.com/renewal-info",
   "meta": {
-    "termsOfService": "https://example.com/acme/terms/2021-10-05",
-    "website": "https://www.example.com/",
+    "termsOfService": "https://example.com/acme/terms",
+    "website": "https://example.com/acme/docs",
     "caaIdentities": ["example.com"],
     "externalAccountRequired": false
   }
@@ -84,7 +84,7 @@ Content-Type: application/json
 
 The "`renewalInfo`" resource is a new resource type introduced to the ACME protocol. This new resource allows clients to query the server for suggestions on when they should renew certificates.
 
-To request the suggested renewal information for a certificate, the client sends a GET request to a path under the server's `renewalInfo` URL.
+To request the suggested renewal information for a certificate, the client sends an unauthenticated GET request to a path under the server's `renewalInfo` URL.
 
 The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding [@!RFC4648] of the `keyIdentifier` field of the certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the DER-encoded Serial Number field (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
 
@@ -102,7 +102,7 @@ For example, to request renewal information for the end-entity certificate given
 3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE`, and the client makes the request (split onto multiple lines for readability):
 
 ~~~ text
-GET https://example.com/acme/renewal-info/
+GET https://acme.example.com/renewal-info/
       aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
 ~~~
 
@@ -112,7 +112,7 @@ The structure of an ACME `renewalInfo` resource is as follows:
 
 `suggestedWindow` (object, required): A JSON object with two keys, "`start`" and "`end`", whose values are timestamps, encoded in the format specified in [@!RFC3339], which bound the window of time in which the CA recommends renewing the certificate.
 
-`explanationURL` (string, optional): A URL pointing to a page which may explain why the suggested renewal window has its current value. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Conforming clients **SHOULD** provide this URL to their operator, if present.
+`explanationURL` (string, optional): A URL pointing to a page which may explain why the suggested renewal window has its current value. For example, it may be a page explaining the CA's dynamic load-balancing strategy, or a page documenting which certificates are affected by a mass revocation event. Clients **SHOULD** provide this URL to their operator, if present.
 
 ~~~ json
 HTTP/1.1 200 OK
@@ -124,11 +124,11 @@ Retry-After: 21600
     "start": "2021-01-03T00:00:00Z",
     "end": "2021-01-07T00:00:00Z"
   },
-  "explanationURL": "https://example.com/docs/ari"
+  "explanationURL": "https://acme.example.com/docs/ari"
 }
 ~~~
 
-Conforming clients **MUST** attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is **RECOMMENDED** for choosing a renewal time:
+Clients **MUST** attempt renewal at a time of their choosing based on the suggested renewal window. The following algorithm is **RECOMMENDED** for choosing a renewal time:
 
   1. Query the `renewalInfo` resource to get a suggested renewal window.
   2. Select a uniform random time within the suggested window.
@@ -145,9 +145,11 @@ A RenewalInfo object in which the `end` timestamp equals or precedes the `start`
 
 ## Schedule for checking the RenewalInfo resource
 
-Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance. Clients MUST stop checking RenewalInfo after a certificate is expired. Clients MUST stop checking RenewalInfo after they consider a certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
+Clients SHOULD fetch a certificate's RenewalInfo immediately after issuance.
 
-During the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header [@!RFC9110] to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the earliest time to retry a request. In this protocol, it indicates both the earliest time and a target time.
+During the lifetime of a certificate, the renewal information needs to be fetched frequently enough that clients learn about changes in the suggested window quickly, but without overwhelming the server. This protocol uses the Retry-After header [@!RFC9110] to indicate to clients how often to retry. Note that in other HTTP applications, Retry-After often indicates the minimum time to wait before retrying a request. In this protocol, it indicates the desired (i.e. both requested minimum and maximum) amount of time to wait.
+
+Clients MUST NOT check a certificate's RenewalInfo after the certificate has expired. Clients MUST NOT check a certificate's RenewalInfo after they consider the certificate to be replaced (for instance, after a new certificate for the same identifiers has been received and configured).
 
 ### Server choice of Retry-After
 
@@ -186,20 +188,20 @@ In order to convey information regarding which certificate requests represent re
 Clients **SHOULD** include this field in New Order requests if there is a clear predecessor certificate, as is the case for most certificate renewals. Clients **SHOULD NOT** include this field if the ACME Server has not indicated that it supports this protocol by advertising the `renewalInfo` resource in its Directory.
 
 ~~~ text
-POST /acme/new-order HTTP/1.1
-Host: example.com
+POST /new-order HTTP/1.1
+Host: acme.example.com
 Content-Type: application/jose+json
 
 {
   "protected": base64url({
     "alg": "ES256",
-    "kid": "https://example.com/acme/acct/evOfKhNU60wg",
+    "kid": "https://acme.example.com/acct/evOfKhNU60wg",
     "nonce": "5XJ1L3lEkMG7tR6pA00clA",
-    "url": "https://example.com/acme/new-order"
+    "url": "https://acme.example.com/new-order"
   }),
   "payload": base64url({
     "identifiers": [
-      { "type": "dns", "value": "example.com" }
+      { "type": "dns", "value": "acme.example.com" }
     ],
     "replaces": "aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE"
   }),
@@ -221,7 +223,7 @@ This replacement information may serve many purposes, including but not limited 
 
 The extensions to the ACME protocol described in this document builds upon the Security Considerations and threat model defined in [@!RFC8555], Section 10.1.
 
-This document specifies that `renewalInfo` resources **MUST** be exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients must send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed the load from clients which do not respect the Retry-After header. As always, servers should take measures to ensure that unauthenticated requests for renewal information cannot result in denial-of-service attacks. These measures might include ensuring that a cache does not include superfluous request headers or query parameters in its cache key, instituting IP-based rate limits, or other general best-practice measures.
+This document specifies that `renewalInfo` resources are exposed and accessed via unauthenticated GET requests, a departure from RFC8555's requirement that clients send POST-as-GET requests to fetch resources from the server. This is because the information contained in `renewalInfo` resources is not considered confidential, and because allowing `renewalInfo` to be easily cached is advantageous to shed the load from clients which do not respect the Retry-After header. As always, servers should take measures to ensure that unauthenticated requests for renewal information cannot result in denial-of-service attacks. These measures might include ensuring that a cache does not include superfluous request headers or query parameters in its cache key, instituting IP-based rate limits, or other general best-practice measures.
 
 Note that this protocol could exhibit undesired behavior in the presence of significant clock skew between the ACME client and server. For example, if a server places the suggested renewal window wholly in the past to encourage a client to renew immediately, a client with a sufficiently slow clock might nonetheless see the window as being in the future. Similarly, a server which wishes to schedule renewals very precisely may have difficulty doing so if some clients have skewed clocks (or do no implement ARI at all). Server operators should take this concern into account when setting suggested renewal windows. However, many other protocols (including TLS handshakes themselves) fall apart with sufficient clock skew, so this is not unique to this protocol.
 
