@@ -88,7 +88,7 @@ To request the suggested renewal information for a certificate, the client sends
 
 The path component is a unique identifier for the certificate in question. The unique identifier is constructed by concatenating the base64url-encoding [@!RFC4648] of the `keyIdentifier` field of the certificate's Authority Key Identifier (AKI) [@!RFC5280] extension, a literal period, and the base64url-encoding of the DER-encoded Serial Number field (without the tag and length bytes). All trailing "`=`" characters MUST be stripped from both parts of the unique identifier.
 
-Thus the full request url is constructed as follows (split onto multiple lines for readability), where the "`||`" operator indicates string concatenation and the renewalInfo url is taken from the Directory object:
+Thus the full request URL is constructed as follows (split onto multiple lines for readability), where the "`||`" operator indicates string concatenation and the renewalInfo URL is taken from the Directory object:
 
 ~~~ text
 url = renewalInfo || '/' ||
@@ -99,11 +99,12 @@ For example, to request renewal information for the end-entity certificate given
 
 1. The `keyIdentifier` field of the certificate's AKI extension has the hexadecimal bytes `69:88:5B:6B:87:46:40:41:E1:B3:7B:84:7B:A0:AE:2C:DE:01:C8:D4` as its ASN.1 Octet String value. The base64url encoding of those bytes is `aYhba4dGQEHhs3uEe6CuLN4ByNQ=`.
 2. The certificate's Serial Number field has the hexadecimal bytes `00:87:65:43:21` as its DER encoding (note the leading zero byte to ensure the serial number remains positive despite the leading 1 bit in `0x87`). The base64url encoding of those bytes is `AIdlQyE=`.
-3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE`, and the client makes the request (split onto multiple lines for readability):
+3. Stripping the trailing padding characters and concatenating with the separator, the unique identifier is therefore `aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE`, and the client makes the request:
 
 ~~~ text
-GET https://acme.example.com/renewal-info/
-      aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
+GET /renewal-info/aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE HTTP/1.1
+Host: acme.example.com
+Accept: application/json
 ~~~
 
 ## RenewalInfo Objects
@@ -121,8 +122,8 @@ Retry-After: 21600
 
 {
   "suggestedWindow": {
-    "start": "2021-01-03T00:00:00Z",
-    "end": "2021-01-07T00:00:00Z"
+    "start": "2025-01-02T04:00:00Z",
+    "end": "2025-01-03T04:00:00Z"
   },
   "explanationURL": "https://acme.example.com/docs/ari"
 }
