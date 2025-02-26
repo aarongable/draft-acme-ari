@@ -190,9 +190,9 @@ Table of Contents
    Number field (without the tag and length bytes).  All trailing "="
    characters MUST be stripped from both parts of the unique identifier.
 
-   Thus the full request url is constructed as follows (split onto
+   Thus the full request URL is constructed as follows (split onto
    multiple lines for readability), where the "||" operator indicates
-   string concatenation and the renewalInfo url is taken from the
+   string concatenation and the renewalInfo URL is taken from the
    Directory object:
 
    url = renewalInfo || '/' ||
@@ -214,10 +214,11 @@ Table of Contents
    3.  Stripping the trailing padding characters and concatenating with
        the separator, the unique identifier is therefore
        aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE, and the client makes the
-       request (split onto multiple lines for readability):
+       request:
 
-   GET https://acme.example.com/renewal-info/
-         aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE
+   GET /renewal-info/aYhba4dGQEHhs3uEe6CuLN4ByNQ.AIdlQyE HTTP/1.1
+   Host: acme.example.com
+   Accept: application/json
 
 4.2.  RenewalInfo Objects
 
@@ -241,8 +242,8 @@ Table of Contents
 
    {
      "suggestedWindow": {
-       "start": "2021-01-03T00:00:00Z",
-       "end": "2021-01-07T00:00:00Z"
+       "start": "2025-01-02T04:00:00Z",
+       "end": "2025-01-03T04:00:00Z"
      },
      "explanationURL": "https://acme.example.com/docs/ari"
    }
