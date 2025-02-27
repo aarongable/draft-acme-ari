@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-25T01:23:16.084207+00:00",
+  "timestamp": "2025-02-27T01:23:03.876911+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1475,15 +1475,15 @@
       "id": "I_kwDOGGBRNc6aYOQF",
       "title": "Enhancement Proposal: Aggregate Endpoint for Efficient Certificate Management in Large Fleets",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/78",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "jmcrawford45",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "I would like to propose an enhancement to the ARI extension that could be beneficial for users managing large fleets of certificates. Specifically, I suggest optionally allowing Certificate Authorities to return all information matching certain constraints under a given account key.\r\n\r\nBackground:\r\n\r\nWe manage a large fleet of a few hundred thousand certificates. Currently, the process involves making individual requests for each certificate, which can be resource-intensive and stateful.\r\n\r\nProposed Enhancement:\r\n\r\nIntroduce an optional feature that allows CAs to provide an aggregate endpoint where accounts can retrieve all relevant information matching specified constraints under a given account key. For example, an account may be interested in exceptional cases with a small upcoming window outside of the expected value or that include a specific explanation url.\r\nThis feature would help reduce the load on both the client and server by minimizing the number of requests needed for  renewing large fleets under a single account, particularly in response to mass revocation events.\r\nIt would also simplify client-side operations by reducing the amount of state that needs to be maintained.\r\n\r\nBenefits:\r\n\r\nImproved efficiency for managing large numbers of certificates.\r\nReduced server load and network traffic.\r\nSimplified client-side implementation and maintenance.\r\nI believe this feature could be valuable for other users with similar needs like #77. Thank you for considering this proposal.",
       "createdAt": "2024-10-15T22:06:24Z",
-      "updatedAt": "2024-10-17T18:41:21Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-26T23:49:17Z",
+      "closedAt": "2025-02-26T23:49:16Z",
       "comments": [
         {
           "author": "mholt",
@@ -1512,6 +1512,13 @@
           "body": "Hi, thanks for the feature request! As said above, this idea has been discussed and rejected earlier in the draft's lifecycle. I'm not opposed to the idea as a general concept, but I have yet to see a _specific_ proposal that is convincingly both efficient and simple.\r\n\r\nAt this point we're in Working Group Last Call, so a proposal for a new feature like this needs to be much more precise and fleshed out. For example:\r\n- What URL is this bulk request made to?\r\n- What set of HTTP methods (POST, GET, POST-as-GET) are acceptable, and how does their behavior differ, if at all?\r\n- What sort of constraints can be specified, and how are those included in the request?\r\n- What does the response look like? In particular, how does it associate renewal windows with individual certificates?\r\n- What happens if the number of entries in the response is too high? (In particular, if you are proposing pagination, what is the pagination or cursoring scheme?)\r\n- Can you point to a client or server implementation of this proposal?\r\n\r\nI think the simplest possible proposal for a bulk endpoint would be \"POST to the directory's `renewalInfo` endpoint with a JSON list of CertIDs; the server rejects the request if the list is too long or if any CertID doesn't belong to the requesting account, and otherwise responds with a JSON object mapping each requested CertID to its suggested renewal window\". It's not clear to me if this would satisfy the desires of large client operators.",
           "createdAt": "2024-10-17T18:39:55Z",
           "updatedAt": "2024-10-17T18:41:21Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "Closing this issue as no concrete proposal for this feature has been put forward.",
+          "createdAt": "2025-02-26T23:49:16Z",
+          "updatedAt": "2025-02-26T23:49:16Z"
         }
       ]
     },
@@ -1572,31 +1579,39 @@
       "id": "I_kwDOGGBRNc6pEc7Q",
       "title": "include a server-side Order object response",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/92",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "jvanasco",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "The draft shows an example POSTed order object, in which the `profile` field appears in the Client submission.\n\nThe draft does not show an example response order object, generated on the server, which includes the `profile` field.\n\nIMHO that would be useful to illustrate that either:\n\n1- the requested profile was honored, and persists\n2- no profile was submitted, but the server assigned it",
       "createdAt": "2025-02-06T20:28:19Z",
-      "updatedAt": "2025-02-06T20:28:19Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-02-26T23:47:42Z",
+      "closedAt": "2025-02-26T23:47:40Z",
+      "comments": [
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "While I agree that it would be nice to include many different example response objects, I struggle to see the value in including a _single_ one, and including more than one would overly bloat the document.\n\nSpecifically:\n- Including a single response which shows that the requested profile was honored is uninteresting, as the resulting object is identical to the request object.\n- Including a single response which shows that a default profile was selected when none was requested requires also including an additional sample request which does not specify a profile, which itself would be uninteresting as it would be identical to the example request that already exists in RFC 8555.\n\nThe whole of RFC 8555 is built around the idea that client request objects and server response objects are the same objects. Implementers of this document should already be familiar with the ACME specification and its handling of such resources.",
+          "createdAt": "2025-02-26T23:47:40Z",
+          "updatedAt": "2025-02-26T23:47:40Z"
+        }
+      ]
     },
     {
       "number": 93,
       "id": "I_kwDOGGBRNc6p2NGN",
       "title": "limit ARI windows to microseconds or less",
       "url": "https://github.com/aarongable/draft-acme-ari/issues/93",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "jvanasco",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "Go's native precision is in nanoseconds (9 digits); \n\nIn [Boulder #7779](https://github.com/letsencrypt/boulder/issues/7779), precision was dropped to support .NET which can only handle 7 digits of precision\n\nIn [Pebble #483](https://github.com/letsencrypt/pebble/issues/483), I note that Python can only handle 6 digits of precision\n\nRFC 3339 just mentions \"fractions\" of seconds and \"decimals\" in relation to ISO standards; (incidentally it was superseded by 9557 in April 2024), so this deeper precision is valid.\n\nIMHO it would be useful if the RFC noted a maximum precision to no more than microseconds, but potentially even less (only to the second?)  Limiting the server's precision would make it much much easier for developers to maintain RFC compliant ACME clients, as the timestamps need to be parsed and modified as strings before they can be cast into native datetime objects in these various languages.\n\n\n\n",
       "createdAt": "2025-02-12T23:20:49Z",
-      "updatedAt": "2025-02-13T18:11:34Z",
-      "closedAt": null,
+      "updatedAt": "2025-02-26T21:58:13Z",
+      "closedAt": "2025-02-26T21:58:12Z",
       "comments": [
         {
           "author": "jvanasco",
@@ -1604,6 +1619,13 @@
           "body": "Adding from the other Pebble thread...\n\nrfc5280 says the following about the notafter/notbefore timestamps: (https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.5.1)\n\n> UTCTime specifies the year\n> through the two low-order digits and time is specified to the\n> precision of one minute or one second.\n\nand\n\n> GeneralizedTime values MUST NOT include fractional seconds.\n\nDropping fractional seconds would make the precision of ARI times consistent with the precision of x509 times.",
           "createdAt": "2025-02-13T18:11:32Z",
           "updatedAt": "2025-02-13T18:11:32Z"
+        },
+        {
+          "author": "aarongable",
+          "authorAssociation": "OWNER",
+          "body": "I think that consistency with the rest of ACME is the higher priority here -- there are many other timestamps in the ACME protocol (new-order notBefore and notAfter, order expiry, and authorization expiry to name a few) and none of those have limitations on the precision of the timestamp. I think that introducing limitations beyond those already inherent in RFC 3339 is not worthwhile; we should let that RFC stand on its own.\n\nI appreciate the work you've done in tracking this down, and having Pebble and Boulder not use nanosecond-precision is clearly the right call here, but I don't think it is correct to mandate that at the protocol level.",
+          "createdAt": "2025-02-26T21:58:12Z",
+          "updatedAt": "2025-02-26T21:58:12Z"
         }
       ]
     }
@@ -4129,6 +4151,90 @@
       "mergedBy": "aarongable",
       "mergeCommit": {
         "oid": "6347ede71343443ccc318d44b09b01928c8a8d18"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 94,
+      "id": "PR_kwDOGGBRNc6MtlP1",
+      "title": "Respond to comments from Paul Wouters",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/94",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Improve example URLs, clarify language around unauthenticated GET requests, simplify description of client scheduling, and remove normative text from the Security Considerations section.\r\n\r\nhttps://mailarchive.ietf.org/arch/msg/acme/hN1DuGHE97UtQLBnrzbOBQ1X-Sc/",
+      "createdAt": "2025-02-26T21:41:31Z",
+      "updatedAt": "2025-02-26T21:42:05Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "6347ede71343443ccc318d44b09b01928c8a8d18",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "paul-wouters",
+      "headRefOid": "d2f3ab15731141061050f33ba155276b34ee31d8",
+      "closedAt": "2025-02-26T21:42:04Z",
+      "mergedAt": "2025-02-26T21:42:04Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "aa0fb35f25e3c0ddcc323ce2c25ce42513d50b1c"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 95,
+      "id": "PR_kwDOGGBRNc6MtmGw",
+      "title": "Respond to comments from Murray Kucherawy",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/95",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Add instructions for the designated expert reviewing registrations in the new ACME Renewal Info Object Fields registry, and strengthen some requirements from SHOULD to MUST.\r\n\r\nhttps://mailarchive.ietf.org/arch/msg/acme/KEnohdxZJ6Bzi4euVAKFLbkEkcE/",
+      "createdAt": "2025-02-26T21:44:09Z",
+      "updatedAt": "2025-02-26T21:44:52Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "aa0fb35f25e3c0ddcc323ce2c25ce42513d50b1c",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "murray-kucherawy",
+      "headRefOid": "098db90b77bf81c0597c8edc1bfef9ff4f97aaec",
+      "closedAt": "2025-02-26T21:44:50Z",
+      "mergedAt": "2025-02-26T21:44:50Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "c71f10c8d6ed81dde52f799aa5981fa040831ee4"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 96,
+      "id": "PR_kwDOGGBRNc6Mtnfu",
+      "title": "Respond to comments from Eric Vyncke",
+      "url": "https://github.com/aarongable/draft-acme-ari/pull/96",
+      "state": "MERGED",
+      "author": "aarongable",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Capitalize \"URL\" everywhere, improve the formatting of the `GET` example, and use more recent dates in the example RenewalInfo response.\r\n\r\nhttps://mailarchive.ietf.org/arch/msg/acme/39amfomGbjKAMTDeAP_Q7mEpg54/",
+      "createdAt": "2025-02-26T21:48:21Z",
+      "updatedAt": "2025-02-26T21:49:32Z",
+      "baseRepository": "aarongable/draft-acme-ari",
+      "baseRefName": "main",
+      "baseRefOid": "c71f10c8d6ed81dde52f799aa5981fa040831ee4",
+      "headRepository": "aarongable/draft-acme-ari",
+      "headRefName": "eric-vyncke",
+      "headRefOid": "577ae808573791c7d80345b1a1ba27d09bf00f7d",
+      "closedAt": "2025-02-26T21:49:31Z",
+      "mergedAt": "2025-02-26T21:49:31Z",
+      "mergedBy": "aarongable",
+      "mergeCommit": {
+        "oid": "166c8dee20ca99fe5b114dbcdeb8019eba082ccc"
       },
       "comments": [],
       "reviews": []
