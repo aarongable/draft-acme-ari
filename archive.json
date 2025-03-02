@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-27T01:23:03.876911+00:00",
+  "timestamp": "2025-03-02T01:34:49.330796+00:00",
   "repo": "aarongable/draft-acme-ari",
   "labels": [
     {
@@ -1610,7 +1610,7 @@
       "labels": [],
       "body": "Go's native precision is in nanoseconds (9 digits); \n\nIn [Boulder #7779](https://github.com/letsencrypt/boulder/issues/7779), precision was dropped to support .NET which can only handle 7 digits of precision\n\nIn [Pebble #483](https://github.com/letsencrypt/pebble/issues/483), I note that Python can only handle 6 digits of precision\n\nRFC 3339 just mentions \"fractions\" of seconds and \"decimals\" in relation to ISO standards; (incidentally it was superseded by 9557 in April 2024), so this deeper precision is valid.\n\nIMHO it would be useful if the RFC noted a maximum precision to no more than microseconds, but potentially even less (only to the second?)  Limiting the server's precision would make it much much easier for developers to maintain RFC compliant ACME clients, as the timestamps need to be parsed and modified as strings before they can be cast into native datetime objects in these various languages.\n\n\n\n",
       "createdAt": "2025-02-12T23:20:49Z",
-      "updatedAt": "2025-02-26T21:58:13Z",
+      "updatedAt": "2025-02-27T18:16:27Z",
       "closedAt": "2025-02-26T21:58:12Z",
       "comments": [
         {
@@ -1626,6 +1626,13 @@
           "body": "I think that consistency with the rest of ACME is the higher priority here -- there are many other timestamps in the ACME protocol (new-order notBefore and notAfter, order expiry, and authorization expiry to name a few) and none of those have limitations on the precision of the timestamp. I think that introducing limitations beyond those already inherent in RFC 3339 is not worthwhile; we should let that RFC stand on its own.\n\nI appreciate the work you've done in tracking this down, and having Pebble and Boulder not use nanosecond-precision is clearly the right call here, but I don't think it is correct to mandate that at the protocol level.",
           "createdAt": "2025-02-26T21:58:12Z",
           "updatedAt": "2025-02-26T21:58:12Z"
+        },
+        {
+          "author": "petercooperjr",
+          "authorAssociation": "NONE",
+          "body": "I can see how wanting the timestamps in ARI to match the same type as the ones in the rest of ACME would be helpful, though it isn't as critical for clients to read those values as it is for them to read ARI data.. Though if Pebble is intended to be a system for clients to test against to make sure they comply with the spec, then Pebble probably ought to be *sure* to use sub-second precision, maybe even sub-nanosecond for ARI (and Expires and so forth), at least as an option, just like it gives random nonce errors, to ensure that clients testing against it know that the spec allows for and clients are expected to handle any level of precision.",
+          "createdAt": "2025-02-27T18:16:26Z",
+          "updatedAt": "2025-02-27T18:16:26Z"
         }
       ]
     }
