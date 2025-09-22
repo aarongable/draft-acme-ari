@@ -1,24 +1,17 @@
 # Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension
 
-This is the working area for the individual Internet-Draft, "Automated Certificate Management Environment (ACME) Renewal Information (ARI) Extension".
+This repository was the working area for the Internet-Draft now published as
+RFC 9773, "ACME Renewal Information (ARI) Extension".
 
-* [Editor's Copy](https://aarongable.github.io/draft-acme-ari/#go.draft-ietf-acme-ari.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-ietf-acme-ari)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-ietf-acme-ari)
-* [Compare Editor's Copy to Individual Draft](https://aarongable.github.io/draft-acme-ari/#go.draft-ietf-acme-ari.diff)
+* [Datatracker Page](https://datatracker.ietf.org/doc/rfc9773/)
+* [HTML Copy](https://www.rfc-editor.org/rfc/rfc9773.html)
+* [Text Copy](https://www.rfc-editor.org/rfc/rfc9773.txt)
 
 ## Contributing
 
-See the [guidelines for contributions](https://github.com/aarongable/draft-acme-ari/blob/main/CONTRIBUTING.md).
+No further contributions should be necessary. If you discover any discrepancies
+between the text archived here and the official copy, you can edit the markdown
+source here, and then use `make` to produce formatted text and HTML versions.
 
-Contributions can be made by editing markdown through the GitHub interface.
-
-## Command Line Usage
-
-Formatted text and HTML versions of the draft can be built using `make`.
-
-```sh
-$ make
-```
-
-This requires that you have the necessary software installed. See [the instructions](https://github.com/martinthomson/i-d-template/blob/main/doc/SETUP.md).
+This requires that you have the necessary software installed.
+See [the instructions](https://github.com/martinthomson/i-d-template/blob/main/doc/SETUP.md).
